@@ -5,7 +5,7 @@ import android.database.Cursor;
 public class SingleColumnFloatRowMapper implements RowMapper<Float> {
 	@Override
 	public Float mapRow(Cursor cursor, int rowNumber) {
-		return CursorUtils.getNullableFloat(cursor, 0);
+		return CursorUtils.getFloat(cursor, 0);
 	}
 }
 

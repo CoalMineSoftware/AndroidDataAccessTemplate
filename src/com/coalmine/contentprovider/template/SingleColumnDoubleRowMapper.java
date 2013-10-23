@@ -5,7 +5,7 @@ import android.database.Cursor;
 public class SingleColumnDoubleRowMapper implements RowMapper<Double> {
 	@Override
 	public Double mapRow(Cursor cursor, int rowNumber) {
-		return CursorUtils.getNullableDouble(cursor, 0);
+		return CursorUtils.getDouble(cursor, 0);
 	}
 }
 

@@ -5,7 +5,7 @@ import android.database.Cursor;
 public class SingleColumnStringRowMapper implements RowMapper<String> {
 	@Override
 	public String mapRow(Cursor cursor, int rowNumber) {
-		return CursorUtils.getNullableString(cursor, 0);
+		return CursorUtils.getString(cursor, 0);
 	}
 }
 

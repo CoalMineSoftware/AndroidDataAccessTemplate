@@ -26,7 +26,7 @@ public class ContentProviderClientTemplate {
             cursor = contentResolver.query(uri, null, selectClause, selectionArguments, null);
             if(cursor.moveToNext()) {
             	if(!cursor.isLast()) {
-            		throw new IllegalArgumentException("Multiple rows returned for the given URI/query.");
+            		throw new IllegalArgumentException("Multiple rows returned for query.");
             	}
 
             	queryResult = rowMapper.mapRow(cursor, 0);
@@ -63,8 +63,9 @@ public class ContentProviderClientTemplate {
 		Cursor cursor = null;
         try {
             cursor = contentResolver.query(uri, null, selectClause, selectionArguments, null);
+            int rowNumber = 0;
             while(cursor.moveToNext()) {
-            	callbackHandler.processRow(cursor);
+            	callbackHandler.processRow(cursor, rowNumber++);
             }
         } finally {
             if (cursor != null) {
