@@ -11,22 +11,24 @@ public class ContentProviderClientTemplate {
 	private ContentResolver contentResolver;
 
 
-	public ContentProviderClientTemplate() { }
-
 	public ContentProviderClientTemplate(ContentResolver contentResolver) {
 		this.contentResolver = contentResolver;
 	}
 
 
-	public <T> T query(Uri uri, String selectClause, String[] selectionArguments, RowMapper<T> rowMapper) {
-		T queryResult = null;
+	public <RowModel> RowModel query(Uri uri, String[] projection, RowMapper<RowModel> rowMapper) {
+		return query(uri, projection, null, null, null, rowMapper);
+	}
+
+	public <RowModel> RowModel query(Uri uri, String[] projection, String selectClause, String[] selectionArguments, String sortOrder, RowMapper<RowModel> rowMapper) {
+		RowModel queryResult = null;
 
 		Cursor cursor = null;
         try {
-            cursor = contentResolver.query(uri, null, selectClause, selectionArguments, null);
+            cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
             if(cursor.moveToNext()) {
             	if(!cursor.isLast()) {
-            		throw new IllegalArgumentException("Multiple rows returned for query.");
+            		throw new IllegalArgumentException("Multiple rows returned for the given URI/query.");
             	}
 
             	queryResult = rowMapper.mapRow(cursor, 0);
@@ -40,12 +42,16 @@ public class ContentProviderClientTemplate {
         return queryResult;
 	}
 
-	public <T> List<T> queryForList(Uri uri, String selectClause, String[] selectionArguments, RowMapper<T> rowMapper) {
-		List<T> queryResults = new ArrayList<T>();
+	public <RowModel> List<RowModel> queryForList(Uri uri, String[] projection, RowMapper<RowModel> rowMapper) {
+		return queryForList(uri, projection, null, null, null, rowMapper);
+	}
+
+	public <RowModel> List<RowModel> queryForList(Uri uri, String[] projection, String selectClause, String[] selectionArguments, String sortOrder, RowMapper<RowModel> rowMapper) {
+		List<RowModel> queryResults = new ArrayList<RowModel>();
 
 		Cursor cursor = null;
         try {
-            cursor = contentResolver.query(uri, null, selectClause, selectionArguments, null);
+            cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
             int rowNumber = 0;
             while(cursor.moveToNext()) {
             	queryResults.add(rowMapper.mapRow(cursor, rowNumber++));
@@ -59,11 +65,15 @@ public class ContentProviderClientTemplate {
         return queryResults;
 	}
 
-	public void query(Uri uri, String selectClause, String[] selectionArguments, RowCallbackHandler callbackHandler) {
+	public void query(Uri uri, String[] projection, RowCallbackHandler callbackHandler) {
+		query(uri, projection, null, null, null, callbackHandler);
+	}
+
+	public void query(Uri uri, String[] projection, String selectClause, String[] selectionArguments, String sortOrder, RowCallbackHandler callbackHandler) {
 		Cursor cursor = null;
         try {
-            cursor = contentResolver.query(uri, null, selectClause, selectionArguments, null);
-            int rowNumber = 0;
+        	int rowNumber = 0;
+            cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
             while(cursor.moveToNext()) {
             	callbackHandler.processRow(cursor, rowNumber++);
             }
@@ -73,10 +83,6 @@ public class ContentProviderClientTemplate {
             }
         }
 	}
-
-	public void setContentResolver(ContentResolver contentResolver) {
-	    this.contentResolver = contentResolver;
-    }
 }
 
 
