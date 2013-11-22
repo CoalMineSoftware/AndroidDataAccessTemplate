@@ -1,4 +1,4 @@
 ContentProviderTemplate
 =======================
 
-Android ContentProviders streamlined, JdbcTemplate-style
+Querying Android ContentProviders, streamlined JdbcTemplate-style.
