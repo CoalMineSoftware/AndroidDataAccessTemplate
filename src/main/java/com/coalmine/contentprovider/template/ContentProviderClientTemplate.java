@@ -24,22 +24,22 @@ public class ContentProviderClientTemplate {
 		RowModel queryResult = null;
 
 		Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
-            if(cursor.moveToNext()) {
-            	if(!cursor.isLast()) {
-            		throw new IllegalArgumentException("Multiple rows returned for the given URI/query.");
-            	}
+		try {
+			cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
+			if(cursor.moveToNext()) {
+				if(!cursor.isLast()) {
+					throw new IllegalArgumentException("Multiple rows returned for the given URI/query.");
+				}
 
-            	queryResult = rowMapper.mapRow(cursor, 0);
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+				queryResult = rowMapper.mapRow(cursor, 0);
+			}
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
 
-        return queryResult;
+		return queryResult;
 	}
 
 	public <RowModel> List<RowModel> queryForList(Uri uri, String[] projection, RowMapper<RowModel> rowMapper) {
@@ -50,19 +50,19 @@ public class ContentProviderClientTemplate {
 		List<RowModel> queryResults = new ArrayList<RowModel>();
 
 		Cursor cursor = null;
-        try {
-            cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
-            int rowNumber = 0;
-            while(cursor.moveToNext()) {
-            	queryResults.add(rowMapper.mapRow(cursor, rowNumber++));
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+		try {
+			cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
+			int rowNumber = 0;
+			while(cursor.moveToNext()) {
+				queryResults.add(rowMapper.mapRow(cursor, rowNumber++));
+			}
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
 
-        return queryResults;
+		return queryResults;
 	}
 
 	public void query(Uri uri, String[] projection, RowCallbackHandler callbackHandler) {
@@ -71,17 +71,17 @@ public class ContentProviderClientTemplate {
 
 	public void query(Uri uri, String[] projection, String selectClause, String[] selectionArguments, String sortOrder, RowCallbackHandler callbackHandler) {
 		Cursor cursor = null;
-        try {
-        	int rowNumber = 0;
-            cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
-            while(cursor.moveToNext()) {
-            	callbackHandler.processRow(cursor, rowNumber++);
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+		try {
+			int rowNumber = 0;
+			cursor = contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
+			while(cursor.moveToNext()) {
+				callbackHandler.processRow(cursor, rowNumber++);
+			}
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
 	}
 }
 

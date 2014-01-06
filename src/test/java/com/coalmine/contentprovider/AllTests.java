@@ -7,8 +7,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({  })
-public class AllTests {
-
-}
+public class AllTests { }
 
 
