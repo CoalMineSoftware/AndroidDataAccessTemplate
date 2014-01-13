@@ -79,6 +79,19 @@ public abstract class CursorUtils {
 	public static String getString(final Cursor cursor, final int columnIndex) {
 		return cursor.isNull(columnIndex)? null : cursor.getString(columnIndex);
 	}
+
+
+	public static byte[] getRequiredBlob(final Cursor cursor, final String columnName) {
+		return cursor.getBlob(cursor.getColumnIndex(columnName));
+	}
+
+	public static byte[] getBlob(final Cursor cursor, final String columnName) {
+		return getBlob(cursor, cursor.getColumnIndex(columnName));
+	}
+
+	public static byte[] getBlob(final Cursor cursor, final int columnIndex) {
+		return cursor.isNull(columnIndex)? null : cursor.getBlob(columnIndex);
+	}
 }
 
 
