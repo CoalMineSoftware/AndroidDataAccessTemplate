@@ -56,7 +56,11 @@ public abstract class CursorUtils {
 
 
 	public static boolean getRequiredBoolean(final Cursor cursor, final String columnName) {
-		return cursor.getInt(cursor.getColumnIndex(columnName)) == 1;
+		return getRequiredBoolean(cursor, cursor.getColumnIndex(columnName));
+	}
+
+	public static boolean getRequiredBoolean(final Cursor cursor, final int columnIndex) {
+		return cursor.getInt(columnIndex) == 1;
 	}
 
 	public static Boolean getBoolean(final Cursor cursor, final String columnName) {
