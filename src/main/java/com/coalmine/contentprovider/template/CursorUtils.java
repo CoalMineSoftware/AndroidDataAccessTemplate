@@ -15,7 +15,20 @@ public abstract class CursorUtils {
 		return cursor.isNull(columnIndex)? null : cursor.getInt(columnIndex);
 	}
 
-	
+
+	public static short getRequiredShort(final Cursor cursor, final String columnName) {
+		return cursor.getShort(cursor.getColumnIndex(columnName));
+	}
+
+	public static Short getShort(final Cursor cursor, final String columnName) {
+		return getShort(cursor, cursor.getColumnIndex(columnName));
+	}
+
+	public static Short getShort(final Cursor cursor, final int columnIndex) {
+		return cursor.isNull(columnIndex)? null : cursor.getShort(columnIndex);
+	}
+
+
 	public static long getRequiredLong(final Cursor cursor, final String columnName) {
 		return cursor.getLong(cursor.getColumnIndex(columnName));
 	}
