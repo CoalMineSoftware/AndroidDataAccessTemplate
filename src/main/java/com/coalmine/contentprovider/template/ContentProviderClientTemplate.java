@@ -3,6 +3,8 @@ package com.coalmine.contentprovider.template;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.coalmine.contentprovider.template.contentvalue.ContentValuesMapper;
+
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -82,6 +84,33 @@ public class ContentProviderClientTemplate {
 				cursor.close();
 			}
 		}
+	}
+
+	/**
+	 * Inserts a record into the given URI, using the given mapper to generate the ContentValues.
+	 * 
+	 * @return The URI of the inserted record, as reported by the ContentProvider being inserted into.
+	 */
+	public <RowModel> Uri insert(Uri uri, RowModel rowObject, ContentValuesMapper<RowModel> mapper) {
+		return contentResolver.insert(uri, mapper.mapContentValues(rowObject));
+	}
+
+	/**
+	 * Updates the given URI, using the given mapper to generate the ContentValues.
+	 * 
+	 * @return The number of rows affected by the update.
+	 */
+	public <RowModel> int update(Uri uri, RowModel rowObject, ContentValuesMapper<RowModel> mapper, String whereClause, String[] selectionArguments) {
+		return contentResolver.update(uri, mapper.mapContentValues(rowObject), whereClause, selectionArguments);
+	}
+
+	/**
+	 * Updates the given URI, using the given mapper to generate the ContentValues.
+	 * 
+	 * @return The number of rows affected by the update.
+	 */
+	public <RowModel> int update(Uri uri, RowModel rowObject, ContentValuesMapper<RowModel> mapper) {
+		return update(uri, rowObject, mapper, null, null);
 	}
 }
 
