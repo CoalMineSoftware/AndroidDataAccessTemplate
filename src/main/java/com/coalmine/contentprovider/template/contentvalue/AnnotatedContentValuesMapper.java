@@ -9,23 +9,32 @@ import android.content.ContentValues;
 
 import com.coalmine.contentprovider.template.contentvalue.annotation.ContentValue;
 
-public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> {
+/** A {@link ContentValuesMapper} implementation that maps all of the model object's fields (including inherited
+ * fields) that are annotated with {@link ContentValue}.  The field's {@link ContentValue#name()} is used as the key of
+ * the value inserted into the generated ContentValues.  If a name is not provided, the field's name is used instead. */
+public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> {
 	Set<Value> modelValues = new HashSet<Value>();
 
-	public AnnotationContentValuesMapper(Class<RowModel> clazz) {
-		for(Field field : clazz.getDeclaredFields()) {
-			if(field.isAnnotationPresent(ContentValue.class)) {
-				ContentValue contentValueAnnotation = field.getAnnotation(ContentValue.class);
+	public AnnotatedContentValuesMapper(Class<RowModel> modelClass) {
+		for(Class<?> currentClass=modelClass; !Object.class.equals(currentClass); currentClass=currentClass.getSuperclass()) {
+			for(Field field : modelClass.getDeclaredFields()) {
+				if(field.isAnnotationPresent(ContentValue.class)) {
+					if(!field.isAccessible()) {
+						field.setAccessible(true);
+					}
 
-				String contentValueName = contentValueAnnotation.name();
-				if(ContentValue.DEFAULT_VALUE.equals(contentValueName)) {
-					contentValueName = field.getName();
+					ContentValue contentValueAnnotation = field.getAnnotation(ContentValue.class);
+
+					String contentValueName = contentValueAnnotation.name();
+					if(ContentValue.DEFAULT_NAME.equals(contentValueName)) {
+						contentValueName = field.getName();
+					}
+					
+					modelValues.add(new Value(
+							contentValueName,
+							field,
+							ValueType.fromClass(field.getType())));
 				}
-
-				modelValues.add(new Value(
-						contentValueName,
-						field,
-						ValueType.fromClass(field.getType())));
 			}
 		}
 	}
@@ -33,7 +42,7 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	public ContentValues mapContentValues(RowModel rowModel) {
 		ContentValues contentValues = new ContentValues(modelValues.size());
 
-		try{
+		try {
 			for(Value value : modelValues) {
 				switch(value.getType()) {
 					case PRIMITIVE_BOOLEAN:
@@ -87,7 +96,7 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 				}
 			}
 		} catch(Exception e) {
-			throw new RuntimeException("", e);
+			throw new RuntimeException("An error occurred while populating ContentValues from model object: " + rowModel, e);
 		}
 
 		return contentValues;
