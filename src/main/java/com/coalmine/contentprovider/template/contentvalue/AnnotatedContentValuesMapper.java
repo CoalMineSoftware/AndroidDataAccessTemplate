@@ -79,41 +79,42 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 
 	public static FieldMappingStrategy determineFieldMappingStrategyForClass(Class<?> clazz) {
 		if(Boolean.class.isAssignableFrom(clazz)) {
-			return new BooleanFieldMappingStrategy();
+			return BooleanFieldMappingStrategy.getInstance();
 		} else if(bool.class.isAssignableFrom(clazz)) {
-			return new PrimitiveBooleanFieldMappingStrategy();
+			return PrimitiveBooleanFieldMappingStrategy.getInstance();
 		} else if(Byte.class.isAssignableFrom(clazz)) {
-			return new ByteFieldMappingStrategy();
+			return ByteFieldMappingStrategy.getInstance();
 		} else if(byte.class.isAssignableFrom(clazz)) {
-			return new PrimitiveByteFieldMappingStrategy();
+			return PrimitiveByteFieldMappingStrategy.getInstance();
 		} else if(byte[].class.isAssignableFrom(clazz)) {
-			return new PrimitiveByteArrayFieldMappingStrategy();
+			return PrimitiveByteArrayFieldMappingStrategy.getInstance();
 		} else if(Float.class.isAssignableFrom(clazz)) {
-			return new FloatFieldMappingStrategy();
+			return FloatFieldMappingStrategy.getInstance();
 		} else if(float.class.isAssignableFrom(clazz)) {
-			return new PrimitiveFloatFieldMappingStrategy();
+			return PrimitiveFloatFieldMappingStrategy.getInstance();
 		} else if(Double.class.isAssignableFrom(clazz)) {
-			return new DoubleFieldMappingStrategy();
+			return DoubleFieldMappingStrategy.getInstance();
 		} else if(double.class.isAssignableFrom(clazz)) {
-			return new PrimitiveDoubleFieldMappingStrategy();
+			return PrimitiveDoubleFieldMappingStrategy.getInstance();
 		} else if(Short.class.isAssignableFrom(clazz)) {
-			return new ShortFieldMappingStrategy();
+			return ShortFieldMappingStrategy.getInstance();
 		} else if(short.class.isAssignableFrom(clazz)) {
-			return new PrimitiveShortFieldMappingStrategy();
+			return PrimitiveShortFieldMappingStrategy.getInstance();
 		} else if(Integer.class.isAssignableFrom(clazz)) {
-			return new IntegerFieldMappingStrategy();
+			return IntegerFieldMappingStrategy.getInstance();
 		} else if(int.class.isAssignableFrom(clazz)) {
-			return new PrimitiveIntegerFieldMappingStrategy();
+			return PrimitiveIntegerFieldMappingStrategy.getInstance();
 		} else if(Long.class.isAssignableFrom(clazz)) {
-			return new LongFieldMappingStrategy();
+			return LongFieldMappingStrategy.getInstance();
 		} else if(long.class.isAssignableFrom(clazz)) {
-			return new PrimitiveLongFieldMappingStrategy();
+			return PrimitiveLongFieldMappingStrategy.getInstance();
 		} else if(String.class.isAssignableFrom(clazz)) {
-			return new StringFieldMappingStrategy();
+			return StringFieldMappingStrategy.getInstance();
 		}
 
 		throw new IllegalArgumentException("Class must be one of the types allowed by ContentProvider.set().");
 	}
+
 
 	private interface FieldMappingStrategy {
 		/**
@@ -128,6 +129,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class PrimitiveBooleanFieldMappingStrategy implements FieldMappingStrategy {
+		private static PrimitiveBooleanFieldMappingStrategy instance;
+
+		public static PrimitiveBooleanFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new PrimitiveBooleanFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, field.getBoolean(modelObject));
@@ -135,6 +145,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class BooleanFieldMappingStrategy implements FieldMappingStrategy {
+		private static BooleanFieldMappingStrategy instance;
+
+		public static BooleanFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new BooleanFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (Boolean)field.get(modelObject));
@@ -142,6 +161,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class PrimitiveByteFieldMappingStrategy implements FieldMappingStrategy {
+		private static PrimitiveByteFieldMappingStrategy instance;
+
+		public static PrimitiveByteFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new PrimitiveByteFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, field.getByte(modelObject));
@@ -149,6 +177,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class ByteFieldMappingStrategy implements FieldMappingStrategy {
+		private static ByteFieldMappingStrategy instance;
+
+		public static ByteFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new ByteFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (Byte)field.get(modelObject));
@@ -156,6 +193,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class PrimitiveByteArrayFieldMappingStrategy implements FieldMappingStrategy {
+		private static PrimitiveByteArrayFieldMappingStrategy instance;
+
+		public static PrimitiveByteArrayFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new PrimitiveByteArrayFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (byte[])field.get(modelObject));
@@ -163,6 +209,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class PrimitiveFloatFieldMappingStrategy implements FieldMappingStrategy {
+		private static PrimitiveFloatFieldMappingStrategy instance;
+
+		public static PrimitiveFloatFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new PrimitiveFloatFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, field.getFloat(modelObject));
@@ -170,6 +225,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class FloatFieldMappingStrategy implements FieldMappingStrategy {
+		private static FloatFieldMappingStrategy instance;
+
+		public static FloatFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new FloatFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (Float)field.get(modelObject));
@@ -177,6 +241,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class PrimitiveDoubleFieldMappingStrategy implements FieldMappingStrategy {
+		private static PrimitiveDoubleFieldMappingStrategy instance;
+
+		public static PrimitiveDoubleFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new PrimitiveDoubleFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, field.getDouble(modelObject));
@@ -184,6 +257,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class DoubleFieldMappingStrategy implements FieldMappingStrategy {
+		private static DoubleFieldMappingStrategy instance;
+
+		public static DoubleFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new DoubleFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (Double)field.get(modelObject));
@@ -191,6 +273,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class PrimitiveShortFieldMappingStrategy implements FieldMappingStrategy {
+		private static PrimitiveShortFieldMappingStrategy instance;
+
+		public static PrimitiveShortFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new PrimitiveShortFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, field.getShort(modelObject));
@@ -198,6 +289,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class ShortFieldMappingStrategy implements FieldMappingStrategy {
+		private static ShortFieldMappingStrategy instance;
+
+		public static ShortFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new ShortFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (Short)field.get(modelObject));
@@ -205,6 +305,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class PrimitiveIntegerFieldMappingStrategy implements FieldMappingStrategy {
+		private static PrimitiveIntegerFieldMappingStrategy instance;
+
+		public static PrimitiveIntegerFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new PrimitiveIntegerFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, field.getInt(modelObject));
@@ -212,6 +321,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class IntegerFieldMappingStrategy implements FieldMappingStrategy {
+		private static IntegerFieldMappingStrategy instance;
+
+		public static IntegerFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new IntegerFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (Integer)field.get(modelObject));
@@ -219,6 +337,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class PrimitiveLongFieldMappingStrategy implements FieldMappingStrategy {
+		private static PrimitiveLongFieldMappingStrategy instance;
+
+		public static PrimitiveLongFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new PrimitiveLongFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, field.getLong(modelObject));
@@ -226,6 +353,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class LongFieldMappingStrategy implements FieldMappingStrategy {
+		private static LongFieldMappingStrategy instance;
+
+		public static LongFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new LongFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (Long)field.get(modelObject));
@@ -233,6 +369,15 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 	}
 
 	private static class StringFieldMappingStrategy implements FieldMappingStrategy {
+		private static StringFieldMappingStrategy instance;
+
+		public static StringFieldMappingStrategy getInstance() {
+			if(instance==null) {
+				instance = new StringFieldMappingStrategy();
+			}
+			return instance;
+		}
+
 		@Override
 		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
 			values.put(valueKey, (String)field.get(modelObject));
