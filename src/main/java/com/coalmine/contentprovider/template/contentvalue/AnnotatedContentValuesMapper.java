@@ -12,8 +12,8 @@ import com.coalmine.contentprovider.template.contentvalue.annotation.ContentValu
 /** A {@link ContentValuesMapper} implementation that maps all of the model object's fields (including inherited
  * fields) that are annotated with {@link ContentValue}.  The field's {@link ContentValue#name()} is used as the key of
  * the value inserted into the generated ContentValues.  If a name is not provided, the field's name is used instead. */
-public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> {
-	Set<Value> modelValues = new HashSet<Value>();
+public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> { 
+	Set<MappableField> mappableFields = new HashSet<MappableField>();
 
 	public AnnotatedContentValuesMapper(Class<RowModel> modelClass) {
 		for(Class<?> currentClass=modelClass; !Object.class.equals(currentClass); currentClass=currentClass.getSuperclass()) {
@@ -25,75 +25,25 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 
 					ContentValue contentValueAnnotation = field.getAnnotation(ContentValue.class);
 
-					String contentValueName = contentValueAnnotation.name();
-					if(ContentValue.DEFAULT_NAME.equals(contentValueName)) {
-						contentValueName = field.getName();
+					String valueKey = contentValueAnnotation.name();
+					if(ContentValue.DEFAULT_NAME.equals(valueKey)) {
+						valueKey = field.getName();
 					}
-					
-					modelValues.add(new Value(
-							contentValueName,
-							field,
-							ValueType.fromClass(field.getType())));
+
+					mappableFields.add(new MappableField(valueKey, field,
+							determineFieldMappingStrategyForClass(field.getType())));
 				}
 			}
 		}
 	}
 
+	@Override
 	public ContentValues mapContentValues(RowModel rowModel) {
-		ContentValues contentValues = new ContentValues(modelValues.size());
+		ContentValues contentValues = new ContentValues(mappableFields.size());
 
 		try {
-			for(Value value : modelValues) {
-				switch(value.getType()) {
-					case PRIMITIVE_BOOLEAN:
-						contentValues.put(value.getValueName(), value.getField().getBoolean(rowModel));
-						break;
-					case BOOLEAN:
-						contentValues.put(value.getValueName(), (Boolean)value.getField().get(rowModel));
-						break;
-					case PRIMITIVE_BYTE:
-						contentValues.put(value.getValueName(), value.getField().getByte(rowModel));
-						break;
-					case BYTE:
-						contentValues.put(value.getValueName(), (Byte)value.getField().get(rowModel));
-						break;
-					case PRIMITIVE_BYTE_ARRAY:
-						contentValues.put(value.getValueName(), (byte[])value.getField().get(rowModel));
-						break;
-					case PRIMITIVE_FLOAT:
-						contentValues.put(value.getValueName(), value.getField().getFloat(rowModel));
-						break;
-					case FLOAT:
-						contentValues.put(value.getValueName(), (Float)value.getField().get(rowModel));
-						break;
-					case PRIMITIVE_DOUBLE:
-						contentValues.put(value.getValueName(), value.getField().getDouble(rowModel));
-						break;
-					case DOUBLE:
-						contentValues.put(value.getValueName(), (Double)value.getField().get(rowModel));
-						break;
-					case PRIMITIVE_SHORT:
-						contentValues.put(value.getValueName(), value.getField().getShort(rowModel));
-						break;
-					case SHORT:
-						contentValues.put(value.getValueName(), (Short)value.getField().get(rowModel));
-						break;
-					case PRIMITIVE_INTEGER:
-						contentValues.put(value.getValueName(), value.getField().getInt(rowModel));
-						break;
-					case INTEGER:
-						contentValues.put(value.getValueName(), (Integer)value.getField().get(rowModel));
-						break;
-					case PRIMITIVE_LONG:
-						contentValues.put(value.getValueName(), value.getField().getLong(rowModel));
-						break;
-					case LONG:
-						contentValues.put(value.getValueName(), (Long)value.getField().get(rowModel));
-						break;
-					case STRING:
-						contentValues.put(value.getValueName(), (String)value.getField().get(rowModel));
-						break;
-				}
+			for(MappableField mappableField : mappableFields) {
+				mappableField.getMappingStrategy().mapField(rowModel, mappableField.getField(), contentValues, mappableField.getValueKey());
 			}
 		} catch(Exception e) {
 			throw new RuntimeException("An error occurred while populating ContentValues from model object: " + rowModel, e);
@@ -102,84 +52,190 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		return contentValues;
 	}
 
-	private enum ValueType {
-		PRIMITIVE_BOOLEAN,
-		BOOLEAN,
-		PRIMITIVE_BYTE,
-		BYTE,
-		PRIMITIVE_BYTE_ARRAY,
-		PRIMITIVE_FLOAT,
-		FLOAT,
-		PRIMITIVE_DOUBLE,
-		DOUBLE,
-		PRIMITIVE_SHORT,
-		SHORT,
-		PRIMITIVE_INTEGER,
-		INTEGER,
-		PRIMITIVE_LONG,
-		LONG,
-		STRING;
-
-		public static ValueType fromClass(Class<?> clazz) {
-			if(Boolean.class.isAssignableFrom(clazz)) {
-				return ValueType.BOOLEAN;
-			} else if(bool.class.isAssignableFrom(clazz)) {
-				return ValueType.PRIMITIVE_BOOLEAN;
-			} else if(Byte.class.isAssignableFrom(clazz)) {
-				return ValueType.BYTE;
-			} else if(byte.class.isAssignableFrom(clazz)) {
-				return ValueType.PRIMITIVE_BYTE;
-			} else if(Byte[].class.isAssignableFrom(clazz)) {
-				return ValueType.PRIMITIVE_BYTE_ARRAY;
-			} else if(Float.class.isAssignableFrom(clazz)) {
-				return ValueType.FLOAT;
-			} else if(float.class.isAssignableFrom(clazz)) {
-				return ValueType.PRIMITIVE_FLOAT;
-			} else if(Double.class.isAssignableFrom(clazz)) {
-				return ValueType.DOUBLE;
-			} else if(double.class.isAssignableFrom(clazz)) {
-				return ValueType.PRIMITIVE_DOUBLE;
-			} else if(Short.class.isAssignableFrom(clazz)) {
-				return ValueType.SHORT;
-			} else if(short.class.isAssignableFrom(clazz)) {
-				return ValueType.PRIMITIVE_SHORT;
-			} else if(Integer.class.isAssignableFrom(clazz)) {
-				return ValueType.INTEGER;
-			} else if(int.class.isAssignableFrom(clazz)) {
-				return ValueType.PRIMITIVE_INTEGER;
-			} else if(Long.class.isAssignableFrom(clazz)) {
-				return ValueType.LONG;
-			} else if(long.class.isAssignableFrom(clazz)) {
-				return ValueType.PRIMITIVE_LONG;
-			} else if(String.class.isAssignableFrom(clazz)) {
-				return ValueType.STRING;
-			}
-
-			throw new IllegalArgumentException("Class must be one of the types allowed by ContentProvider.set().");
-		}
-	}
-
-	private static class Value {
-		private String valueName;
+	private static class MappableField {
+		private String valueKey;
 		private Field field;
-		private ValueType type;
+		private FieldMappingStrategy mappingStrategy;
 
-		public Value(String valueName, Field field, ValueType type) {
-			this.valueName = valueName;
+
+		public MappableField(String valueKey, Field field, FieldMappingStrategy mappingStrategy) {
+			this.valueKey = valueKey;
 			this.field = field;
-			this.type = type;
+			this.mappingStrategy = mappingStrategy;
 		}
 
-		public String getValueName() {
-			return valueName;
+		public String getValueKey() {
+			return valueKey;
 		}
 
 		public Field getField() {
 			return field;
 		}
 
-		public ValueType getType() {
-			return type;
+		public FieldMappingStrategy getMappingStrategy() {
+			return mappingStrategy;
+		}
+	}
+
+	public static FieldMappingStrategy determineFieldMappingStrategyForClass(Class<?> clazz) {
+		if(Boolean.class.isAssignableFrom(clazz)) {
+			return new BooleanFieldMappingStrategy();
+		} else if(bool.class.isAssignableFrom(clazz)) {
+			return new PrimitiveBooleanFieldMappingStrategy();
+		} else if(Byte.class.isAssignableFrom(clazz)) {
+			return new ByteFieldMappingStrategy();
+		} else if(byte.class.isAssignableFrom(clazz)) {
+			return new PrimitiveByteFieldMappingStrategy();
+		} else if(byte[].class.isAssignableFrom(clazz)) {
+			return new PrimitiveByteArrayFieldMappingStrategy();
+		} else if(Float.class.isAssignableFrom(clazz)) {
+			return new FloatFieldMappingStrategy();
+		} else if(float.class.isAssignableFrom(clazz)) {
+			return new PrimitiveFloatFieldMappingStrategy();
+		} else if(Double.class.isAssignableFrom(clazz)) {
+			return new DoubleFieldMappingStrategy();
+		} else if(double.class.isAssignableFrom(clazz)) {
+			return new PrimitiveDoubleFieldMappingStrategy();
+		} else if(Short.class.isAssignableFrom(clazz)) {
+			return new ShortFieldMappingStrategy();
+		} else if(short.class.isAssignableFrom(clazz)) {
+			return new PrimitiveShortFieldMappingStrategy();
+		} else if(Integer.class.isAssignableFrom(clazz)) {
+			return new IntegerFieldMappingStrategy();
+		} else if(int.class.isAssignableFrom(clazz)) {
+			return new PrimitiveIntegerFieldMappingStrategy();
+		} else if(Long.class.isAssignableFrom(clazz)) {
+			return new LongFieldMappingStrategy();
+		} else if(long.class.isAssignableFrom(clazz)) {
+			return new PrimitiveLongFieldMappingStrategy();
+		} else if(String.class.isAssignableFrom(clazz)) {
+			return new StringFieldMappingStrategy();
+		}
+
+		throw new IllegalArgumentException("Class must be one of the types allowed by ContentProvider.set().");
+	}
+
+	private interface FieldMappingStrategy {
+		/**
+		 * Extracts a value of 'field' from 'modelObject' and inserts it into 'values', under 'valueKey' 
+		 * 
+		 * @param modelObject Object from which to extract the value for the ContentValues
+		 * @param valueKey Key under which to store the value extracted from the field
+		 * @param field The field from which to extract the value from
+		 * @param values ContentValues to insert the extracted value into
+		 */
+		void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException;
+	}
+
+	private static class PrimitiveBooleanFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, field.getBoolean(modelObject));
+		}
+	}
+
+	private static class BooleanFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (Boolean)field.get(modelObject));
+		}
+	}
+
+	private static class PrimitiveByteFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, field.getByte(modelObject));
+		}
+	}
+
+	private static class ByteFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (Byte)field.get(modelObject));
+		}
+	}
+
+	private static class PrimitiveByteArrayFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (byte[])field.get(modelObject));
+		}
+	}
+
+	private static class PrimitiveFloatFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, field.getFloat(modelObject));
+		}
+	}
+
+	private static class FloatFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (Float)field.get(modelObject));
+		}
+	}
+
+	private static class PrimitiveDoubleFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, field.getDouble(modelObject));
+		}
+	}
+
+	private static class DoubleFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (Double)field.get(modelObject));
+		}
+	}
+
+	private static class PrimitiveShortFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, field.getShort(modelObject));
+		}
+	}
+
+	private static class ShortFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (Short)field.get(modelObject));
+		}
+	}
+
+	private static class PrimitiveIntegerFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, field.getInt(modelObject));
+		}
+	}
+
+	private static class IntegerFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (Integer)field.get(modelObject));
+		}
+	}
+
+	private static class PrimitiveLongFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, field.getLong(modelObject));
+		}
+	}
+
+	private static class LongFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (Long)field.get(modelObject));
+		}
+	}
+
+	private static class StringFieldMappingStrategy implements FieldMappingStrategy {
+		@Override
+		public void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException {
+			values.put(valueKey, (String)field.get(modelObject));
 		}
 	}
 }
