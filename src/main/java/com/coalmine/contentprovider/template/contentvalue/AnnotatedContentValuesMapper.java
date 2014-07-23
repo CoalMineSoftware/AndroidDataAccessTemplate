@@ -13,7 +13,7 @@ import com.coalmine.contentprovider.template.contentvalue.annotation.ContentValu
  * fields) that are annotated with {@link ContentValue}.  The field's {@link ContentValue#name()} is used as the key of
  * the value inserted into the generated ContentValues.  If a name is not provided, the field's name is used instead. */
 public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> { 
-	Set<MappableField> mappableFields = new HashSet<MappableField>();
+	private Set<MappableField> mappableFields = new HashSet<MappableField>();
 
 	public AnnotatedContentValuesMapper(Class<RowModel> modelClass) {
 		for(Class<?> currentClass=modelClass; !Object.class.equals(currentClass); currentClass=currentClass.getSuperclass()) {

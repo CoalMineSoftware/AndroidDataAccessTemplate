@@ -1,24 +1,32 @@
 package com.coalmine.contentprovider.template;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowContentResolver;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.database.MatrixCursor;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE)
 public class ContentProviderClientTemplateTest {
-    @BeforeClass
-    public void setupOnce() {
+	private static final String AUTHORITY = "com.company.project.package";
+
+
+	@Before
+    public void setup() {
         ContentProvider provider = null;
         ContentResolver resolver = Robolectric.application.getContentResolver();
         ShadowContentResolver shadowResolver = Robolectric.shadowOf(resolver);
         provider.onCreate();
-        ShadowContentResolver.registerProvider("com.auth", provider);
+        ShadowContentResolver.registerProvider(AUTHORITY, provider);
     }
 
 

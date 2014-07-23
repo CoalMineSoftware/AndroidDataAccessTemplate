@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.MatrixCursor;
 
+
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest=Config.NONE)
 public class CursorUtilsTest {
@@ -21,25 +22,13 @@ public class CursorUtilsTest {
 
 	// Values returned by MatrixCursor when the value of null column is gotten
 	private static final int UNDEFINED_INTEGER_VALUE = 0;
-	private static final long UNDEFINED_LONG_VALUE = 0;
 	private static final short UNDEFINED_SHORT_VALUE = 0;
+	private static final long UNDEFINED_LONG_VALUE = 0;
 	private static final float UNDEFINED_FLOAT_VALUE = 0;
 	private static final double UNDEFINED_DOUBLE_VALUE = 0;
 
-	private static <T> T[] asArray(T... objects) {
-		return objects;
-	}
 
-	/** Similar to utility methods that build a "singleton" Collection containing a single value,
-	 * this method builds a Cursor with a single row and column, containing the given value. */
-	private static Cursor buildSingletonCursor(Object value) {
-		MatrixCursor cursor = new MatrixCursor(asArray(COLUMN_NAME));
-		cursor.addRow(asArray(value));
-		cursor.moveToFirst();
-
-		return cursor;
-	}
-
+	// Integer extraction tests
 
 	@Test
 	public void testGetRequiredIntegerByName() {
@@ -66,16 +55,16 @@ public class CursorUtilsTest {
 
 	@Test
 	public void testGetIntegerByName() {
-		Integer value = 5;
-		Cursor cursor = buildSingletonCursor(value);
+		Integer columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
 
-		assertEquals(value, CursorUtils.getInteger(cursor,COLUMN_NAME));
+		assertEquals(columnValue, CursorUtils.getInteger(cursor,COLUMN_NAME));
 	}
 
 	@Test(expected=CursorIndexOutOfBoundsException.class)
 	public void testGetIntegerByName_withInvalidColumnName() {
-		Integer value = 5;
-		Cursor cursor = buildSingletonCursor(value);
+		Integer columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
 
 		CursorUtils.getInteger(cursor,INVALID_COLUMN_NAME);
 	}
@@ -89,16 +78,16 @@ public class CursorUtilsTest {
 
 	@Test
 	public void testGetIntegerByIndex() {
-		Integer value = 5;
-		Cursor cursor = buildSingletonCursor(value);
+		Integer columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
 
-		assertEquals(value, CursorUtils.getInteger(cursor, COLUMN_INDEX));
+		assertEquals(columnValue, CursorUtils.getInteger(cursor, COLUMN_INDEX));
 	}
 
 	@Test(expected=CursorIndexOutOfBoundsException.class)
 	public void testGetIntegerByIndex_withInvalidColumnName() {
-		Integer value = 5;
-		Cursor cursor = buildSingletonCursor(value);
+		Integer columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
 
 		CursorUtils.getInteger(cursor,INVALID_COLUMN_INDEX);
 	}
@@ -109,6 +98,79 @@ public class CursorUtilsTest {
 
 		assertNull(CursorUtils.getInteger(cursor, COLUMN_INDEX));
 	}
+
+	// Short extraction tests
+
+	@Test
+	public void testGetRequiredShortByName() {
+		short columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getRequiredShort(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetRequiredShortByName_withInvalidColumnName() {
+		short columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getRequiredShort(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetRequiredShortByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertEquals(UNDEFINED_SHORT_VALUE, CursorUtils.getRequiredLong(cursor, COLUMN_NAME));
+	}
+
+	@Test
+	public void testGetShortByName() {
+		Short columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getShort(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetShortByName_withInvalidColumnName() {
+		Short columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getShort(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetShortByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getShort(cursor, COLUMN_NAME));
+	}
+
+	@Test
+	public void testGetShortByIndex() {
+		Short columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getShort(cursor, COLUMN_INDEX));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetShortByIndex_withInvalidColumnName() {
+		Short columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getShort(cursor, INVALID_COLUMN_INDEX);
+	}
+
+	@Test
+	public void testGetShortByIndex_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getShort(cursor, COLUMN_INDEX));
+	}
+
+	// Long extraction tests
 
 	@Test
 	public void testGetRequiredLongByName() {
@@ -158,16 +220,16 @@ public class CursorUtilsTest {
 
 	@Test
 	public void testGetLongByIndex() {
-		Long value = 5L;
-		Cursor cursor = buildSingletonCursor(value);
+		Long columnValue = 5L;
+		Cursor cursor = buildSingletonCursor(columnValue);
 
-		assertEquals(value, CursorUtils.getLong(cursor, COLUMN_INDEX));
+		assertEquals(columnValue, CursorUtils.getLong(cursor, COLUMN_INDEX));
 	}
 
 	@Test(expected=CursorIndexOutOfBoundsException.class)
 	public void testGetLongByIndex_withInvalidColumnName() {
-		Long value = 5L;
-		Cursor cursor = buildSingletonCursor(value);
+		Long columnValue = 5L;
+		Cursor cursor = buildSingletonCursor(columnValue);
 
 		CursorUtils.getLong(cursor, INVALID_COLUMN_INDEX);
 	}
@@ -179,84 +241,371 @@ public class CursorUtilsTest {
 		assertNull(CursorUtils.getLong(cursor, COLUMN_INDEX));
 	}
 
+	// Float extraction tests
+
 	@Test
 	public void testGetRequiredFloatByName() {
-		fail("Not yet implemented");
+		float columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getRequiredFloat(cursor, COLUMN_NAME), 0);
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetRequiredFloatByName_withInvalidColumnName() {
+		float columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getRequiredFloat(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetRequiredFloatByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertEquals(UNDEFINED_FLOAT_VALUE, CursorUtils.getRequiredFloat(cursor, COLUMN_NAME), 0);
 	}
 
 	@Test
 	public void testGetFloatByName() {
-		fail("Not yet implemented");
+		Float columnValue = 5f;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getFloat(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetFloatByName_withInvalidColumnName() {
+		Float columnValue = 5f;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getFloat(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetFloatByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getFloat(cursor, COLUMN_NAME));
 	}
 
 	@Test
 	public void testGetFloatByIndex() {
-		fail("Not yet implemented");
+		Float columnValue = 5f;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getFloat(cursor, COLUMN_INDEX));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetFloatByIndex_withInvalidColumnName() {
+		Float columnValue = 5f;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getFloat(cursor, INVALID_COLUMN_INDEX);
 	}
 
 	@Test
+	public void testGetFloatByIndex_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getFloat(cursor, COLUMN_INDEX));
+	}
+
+	// Double extraction tests
+
+	@Test
 	public void testGetRequiredDoubleByName() {
-		fail("Not yet implemented");
+		double columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getRequiredDouble(cursor, COLUMN_NAME), 0);
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetRequiredDoubleByName_withInvalidColumnName() {
+		double columnValue = 5;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getRequiredDouble(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetRequiredDoubleByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertEquals(UNDEFINED_DOUBLE_VALUE, CursorUtils.getRequiredDouble(cursor, COLUMN_NAME), 0);
 	}
 
 	@Test
 	public void testGetDoubleByName() {
-		fail("Not yet implemented");
+		Double columnValue = 5d;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getDouble(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetDoubleByName_withInvalidColumnName() {
+		Double columnValue = 5d;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getDouble(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetDoubleByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getDouble(cursor, COLUMN_NAME));
 	}
 
 	@Test
 	public void testGetDoubleByIndex() {
-		fail("Not yet implemented");
+		Double columnValue = 5d;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getDouble(cursor, COLUMN_INDEX));
 	}
 
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetDoubleByIndex_withInvalidColumnName() {
+		Double columnValue = 5d;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getDouble(cursor, INVALID_COLUMN_INDEX);
+	}
+
+	@Test
+	public void testGetDoubleByIndex_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getDouble(cursor, COLUMN_INDEX));
+	}
+
+	// Boolean extraction tests
+	
 	@Test
 	public void testGetRequiredBooleanByName() {
-		fail("Not yet implemented");
+		int columnValue = 1;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertTrue(CursorUtils.getRequiredBoolean(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetRequiredBooleanByName_withInvalidColumnName() {
+		Cursor cursor = buildSingletonCursor(true);
+
+		CursorUtils.getRequiredBoolean(cursor, INVALID_COLUMN_NAME);
 	}
 
 	@Test
-	public void testGetRequiredBooleanByIndex() {
-		fail("Not yet implemented");
+	public void testGetRequiredBooleanByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertFalse(CursorUtils.getRequiredBoolean(cursor, COLUMN_NAME));
 	}
 
 	@Test
 	public void testGetBooleanByName() {
-		fail("Not yet implemented");
+		int columnValue = 1;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertTrue(CursorUtils.getBoolean(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetBooleanByName_withInvalidColumnName() {
+		Cursor cursor = buildSingletonCursor(true);
+
+		CursorUtils.getBoolean(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetBooleanByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getBoolean(cursor, COLUMN_NAME));
 	}
 
 	@Test
 	public void testGetBooleanByIndex() {
-		fail("Not yet implemented");
+		int columnValue = 1;
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertTrue(CursorUtils.getBoolean(cursor, COLUMN_INDEX));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetBooleanByIndex_withInvalidColumnName() {
+		Cursor cursor = buildSingletonCursor(true);
+
+		CursorUtils.getBoolean(cursor, INVALID_COLUMN_INDEX);
 	}
 
 	@Test
+	public void testGetBooleanByIndex_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getBoolean(cursor, COLUMN_INDEX));
+	}
+
+	// String extraction tests
+	
+	@Test
 	public void testGetRequiredStringByName() {
-		fail("Not yet implemented");
+		String columnValue = "test";
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getRequiredString(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetRequiredStringByName_withInvalidColumnName() {
+		String columnValue = "test";
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getRequiredString(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetRequiredStringByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getRequiredString(cursor, COLUMN_NAME));
 	}
 
 	@Test
 	public void testGetStringByName() {
-		fail("Not yet implemented");
+		String columnValue = "test";
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getString(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetStringByName_withInvalidColumnName() {
+		String columnValue = "test";
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getString(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetStringByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getString(cursor, COLUMN_NAME));
 	}
 
 	@Test
 	public void testGetStringByIndex() {
-		fail("Not yet implemented");
+		String columnValue = "test";
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getString(cursor, COLUMN_INDEX));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetStringByIndex_withInvalidColumnName() {
+		String columnValue = "test";
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getString(cursor, INVALID_COLUMN_INDEX);
 	}
 
 	@Test
+	public void testGetStringByIndex_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getString(cursor, COLUMN_INDEX));
+	}
+
+	// Blob extraction tests
+
+	@Test
 	public void testGetRequiredBlobByName() {
-		fail("Not yet implemented");
+		byte[] columnValue = "test".getBytes();
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getRequiredBlob(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetRequiredBlobByName_withInvalidColumnName() {
+		byte[] columnValue = "test".getBytes();
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getRequiredString(cursor, INVALID_COLUMN_NAME);
+	}
+
+	@Test
+	public void testGetRequiredBlobByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getRequiredBlob(cursor, COLUMN_NAME));
 	}
 
 	@Test
 	public void testGetBlobByName() {
-		fail("Not yet implemented");
+		byte[] columnValue = "test".getBytes();
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getBlob(cursor, COLUMN_NAME));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetBlobByName_withInvalidColumnName() {
+		byte[] columnValue = "test".getBytes();
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getBlob(cursor, INVALID_COLUMN_NAME);
 	}
 
 	@Test
-	public void testGetBlobCursorByIndex() {
-		fail("Not yet implemented");
+	public void testGetBlobByName_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getBlob(cursor, COLUMN_NAME));
+	}
+
+	@Test
+	public void testGetBlobByIndex() {
+		byte[] columnValue = "test".getBytes();
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		assertEquals(columnValue, CursorUtils.getBlob(cursor, COLUMN_INDEX));
+	}
+
+	@Test(expected=CursorIndexOutOfBoundsException.class)
+	public void testGetBlobByIndex_withInvalidColumnName() {
+		byte[] columnValue = "test".getBytes();
+		Cursor cursor = buildSingletonCursor(columnValue);
+
+		CursorUtils.getBlob(cursor, INVALID_COLUMN_INDEX);
+	}
+
+	@Test
+	public void testGetBlobByIndex_withNullColumnValue() {
+		Cursor cursor = buildSingletonCursor(null);
+
+		assertNull(CursorUtils.getBlob(cursor, COLUMN_INDEX));
+	}
+
+
+	/** Similar to utility methods that build a "singleton" Collection containing a single value,
+	 * this method builds a Cursor with a single row and column, containing the given value. */
+	private static Cursor buildSingletonCursor(Object value) {
+		MatrixCursor cursor = new MatrixCursor(asArray(COLUMN_NAME));
+		cursor.addRow(asArray(value));
+		cursor.moveToFirst();
+
+		return cursor;
+	}
+
+	private static <T> T[] asArray(T... objects) {
+		return objects;
 	}
 }
 
