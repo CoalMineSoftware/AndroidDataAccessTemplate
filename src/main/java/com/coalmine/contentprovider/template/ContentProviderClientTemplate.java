@@ -5,10 +5,17 @@ import java.util.List;
 
 import com.coalmine.contentprovider.template.contentvalue.ContentValuesMapper;
 
+import android.content.ContentProvider;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+/** Providers a simpler API for developers to interact with {@link ContentProvider}s, eliminating
+ * much of the boilerplate code.  The design also encouraging developers to write self-contained,
+ * reusable {@link RowMapper}s and {@link RowCallbackHandler}s for building business objects from
+ * Cursor rows, and {@link ContentValuesMapper}s for generating {@link ContentValues} from business
+ * objects. */
 public class ContentProviderClientTemplate {
 	private ContentResolver contentResolver;
 

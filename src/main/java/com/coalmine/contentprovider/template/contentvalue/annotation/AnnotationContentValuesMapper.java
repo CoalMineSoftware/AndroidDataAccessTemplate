@@ -1,23 +1,22 @@
-package com.coalmine.contentprovider.template.contentvalue;
+package com.coalmine.contentprovider.template.contentvalue.annotation;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
-import android.R.bool;
 import android.content.ContentValues;
 
-import com.coalmine.contentprovider.template.contentvalue.annotation.ContentValue;
+import com.coalmine.contentprovider.template.contentvalue.ContentValuesMapper;
 
 /** A {@link ContentValuesMapper} implementation that maps all of the model object's fields (including inherited
  * fields) that are annotated with {@link ContentValue}.  The field's {@link ContentValue#name()} is used as the key of
  * the value inserted into the generated ContentValues.  If a name is not provided, the field's name is used instead. */
-public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> { 
+public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> { 
 	private Set<MappableField> mappableFields = new HashSet<MappableField>();
 
-	public AnnotatedContentValuesMapper(Class<RowModel> modelClass) {
+	public AnnotationContentValuesMapper(Class<RowModel> modelClass) {
 		for(Class<?> currentClass=modelClass; !Object.class.equals(currentClass); currentClass=currentClass.getSuperclass()) {
-			for(Field field : modelClass.getDeclaredFields()) {
+			for(Field field : currentClass.getDeclaredFields()) {
 				if(field.isAnnotationPresent(ContentValue.class)) {
 					if(!field.isAccessible()) {
 						field.setAccessible(true);
@@ -52,7 +51,11 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		return contentValues;
 	}
 
-	private static class MappableField {
+	protected Set<MappableField> getMappableFields() {
+		return mappableFields;
+	}
+
+	protected static class MappableField {
 		private String valueKey;
 		private Field field;
 		private FieldMappingStrategy mappingStrategy;
@@ -77,46 +80,46 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	public static FieldMappingStrategy determineFieldMappingStrategyForClass(Class<?> clazz) {
-		if(Boolean.class.isAssignableFrom(clazz)) {
+	protected static FieldMappingStrategy determineFieldMappingStrategyForClass(Class<?> fieldClass) {
+		if(Boolean.class.isAssignableFrom(fieldClass)) {
 			return BooleanFieldMappingStrategy.getInstance();
-		} else if(bool.class.isAssignableFrom(clazz)) {
+		} else if(boolean.class.isAssignableFrom(fieldClass)) {
 			return PrimitiveBooleanFieldMappingStrategy.getInstance();
-		} else if(Byte.class.isAssignableFrom(clazz)) {
+		} else if(Byte.class.isAssignableFrom(fieldClass)) {
 			return ByteFieldMappingStrategy.getInstance();
-		} else if(byte.class.isAssignableFrom(clazz)) {
+		} else if(byte.class.isAssignableFrom(fieldClass)) {
 			return PrimitiveByteFieldMappingStrategy.getInstance();
-		} else if(byte[].class.isAssignableFrom(clazz)) {
+		} else if(byte[].class.isAssignableFrom(fieldClass)) {
 			return PrimitiveByteArrayFieldMappingStrategy.getInstance();
-		} else if(Float.class.isAssignableFrom(clazz)) {
+		} else if(Float.class.isAssignableFrom(fieldClass)) {
 			return FloatFieldMappingStrategy.getInstance();
-		} else if(float.class.isAssignableFrom(clazz)) {
+		} else if(float.class.isAssignableFrom(fieldClass)) {
 			return PrimitiveFloatFieldMappingStrategy.getInstance();
-		} else if(Double.class.isAssignableFrom(clazz)) {
+		} else if(Double.class.isAssignableFrom(fieldClass)) {
 			return DoubleFieldMappingStrategy.getInstance();
-		} else if(double.class.isAssignableFrom(clazz)) {
+		} else if(double.class.isAssignableFrom(fieldClass)) {
 			return PrimitiveDoubleFieldMappingStrategy.getInstance();
-		} else if(Short.class.isAssignableFrom(clazz)) {
+		} else if(Short.class.isAssignableFrom(fieldClass)) {
 			return ShortFieldMappingStrategy.getInstance();
-		} else if(short.class.isAssignableFrom(clazz)) {
+		} else if(short.class.isAssignableFrom(fieldClass)) {
 			return PrimitiveShortFieldMappingStrategy.getInstance();
-		} else if(Integer.class.isAssignableFrom(clazz)) {
+		} else if(Integer.class.isAssignableFrom(fieldClass)) {
 			return IntegerFieldMappingStrategy.getInstance();
-		} else if(int.class.isAssignableFrom(clazz)) {
+		} else if(int.class.isAssignableFrom(fieldClass)) {
 			return PrimitiveIntegerFieldMappingStrategy.getInstance();
-		} else if(Long.class.isAssignableFrom(clazz)) {
+		} else if(Long.class.isAssignableFrom(fieldClass)) {
 			return LongFieldMappingStrategy.getInstance();
-		} else if(long.class.isAssignableFrom(clazz)) {
+		} else if(long.class.isAssignableFrom(fieldClass)) {
 			return PrimitiveLongFieldMappingStrategy.getInstance();
-		} else if(String.class.isAssignableFrom(clazz)) {
+		} else if(String.class.isAssignableFrom(fieldClass)) {
 			return StringFieldMappingStrategy.getInstance();
 		}
 
-		throw new IllegalArgumentException("Class must be one of the types allowed by ContentProvider.set().");
+		throw new IllegalArgumentException("Class must be one of the types allowed by ContentProvider.set().  Class was "+fieldClass.getSimpleName());
 	}
 
 
-	private interface FieldMappingStrategy {
+	protected interface FieldMappingStrategy {
 		/**
 		 * Extracts a value of 'field' from 'modelObject' and inserts it into 'values', under 'valueKey' 
 		 * 
@@ -128,7 +131,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		void mapField(Object modelObject, Field field, ContentValues values, String valueKey) throws IllegalArgumentException, IllegalAccessException;
 	}
 
-	private static class PrimitiveBooleanFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class PrimitiveBooleanFieldMappingStrategy implements FieldMappingStrategy {
 		private static PrimitiveBooleanFieldMappingStrategy instance;
 
 		public static PrimitiveBooleanFieldMappingStrategy getInstance() {
@@ -144,7 +147,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class BooleanFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class BooleanFieldMappingStrategy implements FieldMappingStrategy {
 		private static BooleanFieldMappingStrategy instance;
 
 		public static BooleanFieldMappingStrategy getInstance() {
@@ -160,7 +163,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class PrimitiveByteFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class PrimitiveByteFieldMappingStrategy implements FieldMappingStrategy {
 		private static PrimitiveByteFieldMappingStrategy instance;
 
 		public static PrimitiveByteFieldMappingStrategy getInstance() {
@@ -176,7 +179,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class ByteFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class ByteFieldMappingStrategy implements FieldMappingStrategy {
 		private static ByteFieldMappingStrategy instance;
 
 		public static ByteFieldMappingStrategy getInstance() {
@@ -192,7 +195,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class PrimitiveByteArrayFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class PrimitiveByteArrayFieldMappingStrategy implements FieldMappingStrategy {
 		private static PrimitiveByteArrayFieldMappingStrategy instance;
 
 		public static PrimitiveByteArrayFieldMappingStrategy getInstance() {
@@ -208,7 +211,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class PrimitiveFloatFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class PrimitiveFloatFieldMappingStrategy implements FieldMappingStrategy {
 		private static PrimitiveFloatFieldMappingStrategy instance;
 
 		public static PrimitiveFloatFieldMappingStrategy getInstance() {
@@ -224,7 +227,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class FloatFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class FloatFieldMappingStrategy implements FieldMappingStrategy {
 		private static FloatFieldMappingStrategy instance;
 
 		public static FloatFieldMappingStrategy getInstance() {
@@ -240,7 +243,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class PrimitiveDoubleFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class PrimitiveDoubleFieldMappingStrategy implements FieldMappingStrategy {
 		private static PrimitiveDoubleFieldMappingStrategy instance;
 
 		public static PrimitiveDoubleFieldMappingStrategy getInstance() {
@@ -256,7 +259,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class DoubleFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class DoubleFieldMappingStrategy implements FieldMappingStrategy {
 		private static DoubleFieldMappingStrategy instance;
 
 		public static DoubleFieldMappingStrategy getInstance() {
@@ -272,7 +275,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class PrimitiveShortFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class PrimitiveShortFieldMappingStrategy implements FieldMappingStrategy {
 		private static PrimitiveShortFieldMappingStrategy instance;
 
 		public static PrimitiveShortFieldMappingStrategy getInstance() {
@@ -288,7 +291,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class ShortFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class ShortFieldMappingStrategy implements FieldMappingStrategy {
 		private static ShortFieldMappingStrategy instance;
 
 		public static ShortFieldMappingStrategy getInstance() {
@@ -304,7 +307,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class PrimitiveIntegerFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class PrimitiveIntegerFieldMappingStrategy implements FieldMappingStrategy {
 		private static PrimitiveIntegerFieldMappingStrategy instance;
 
 		public static PrimitiveIntegerFieldMappingStrategy getInstance() {
@@ -320,7 +323,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class IntegerFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class IntegerFieldMappingStrategy implements FieldMappingStrategy {
 		private static IntegerFieldMappingStrategy instance;
 
 		public static IntegerFieldMappingStrategy getInstance() {
@@ -336,7 +339,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class PrimitiveLongFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class PrimitiveLongFieldMappingStrategy implements FieldMappingStrategy {
 		private static PrimitiveLongFieldMappingStrategy instance;
 
 		public static PrimitiveLongFieldMappingStrategy getInstance() {
@@ -352,7 +355,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class LongFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class LongFieldMappingStrategy implements FieldMappingStrategy {
 		private static LongFieldMappingStrategy instance;
 
 		public static LongFieldMappingStrategy getInstance() {
@@ -368,7 +371,7 @@ public class AnnotatedContentValuesMapper<RowModel> implements ContentValuesMapp
 		}
 	}
 
-	private static class StringFieldMappingStrategy implements FieldMappingStrategy {
+	protected static class StringFieldMappingStrategy implements FieldMappingStrategy {
 		private static StringFieldMappingStrategy instance;
 
 		public static StringFieldMappingStrategy getInstance() {
