@@ -22,6 +22,8 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 
+import com.coalmine.contentprovider.template.simple.SingleColumnIntegerRowMapper;
+
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest=Config.NONE)
 public class ContentProviderClientTemplateTest {

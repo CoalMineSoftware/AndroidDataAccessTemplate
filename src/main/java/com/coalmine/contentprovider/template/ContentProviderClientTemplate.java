@@ -3,8 +3,6 @@ package com.coalmine.contentprovider.template;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.coalmine.contentprovider.template.contentvalue.ContentValuesMapper;
-
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;

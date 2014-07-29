@@ -1,4 +1,4 @@
-package com.coalmine.contentprovider.template.contentvalue.annotation;
+package com.coalmine.contentprovider.template.annotation;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -6,7 +6,7 @@ import java.util.Set;
 
 import android.content.ContentValues;
 
-import com.coalmine.contentprovider.template.contentvalue.ContentValuesMapper;
+import com.coalmine.contentprovider.template.ContentValuesMapper;
 
 /** A {@link ContentValuesMapper} implementation that maps all of the model object's fields (including inherited
  * fields) that are annotated with {@link ContentValue}.  The field's {@link ContentValue#name()} is used as the key of

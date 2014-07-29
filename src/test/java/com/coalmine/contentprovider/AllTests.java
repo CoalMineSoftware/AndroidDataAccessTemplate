@@ -6,7 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import com.coalmine.contentprovider.template.ContentProviderClientTemplateTest;
 import com.coalmine.contentprovider.template.CursorUtilsTest;
-import com.coalmine.contentprovider.template.contentvalue.annotation.AnnotationContentValuesMapperTest;
+import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapperTest;
 
 
 @RunWith(Suite.class)

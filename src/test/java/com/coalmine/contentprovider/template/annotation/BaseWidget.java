@@ -1,6 +1,5 @@
-package com.coalmine.contentprovider.template.contentvalue.annotation;
+package com.coalmine.contentprovider.template.annotation;
 
-import com.coalmine.contentprovider.template.contentvalue.annotation.ContentValue;
 
 public class BaseWidget {
 	@ContentValue

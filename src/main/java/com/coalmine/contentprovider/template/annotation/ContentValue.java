@@ -1,4 +1,4 @@
-package com.coalmine.contentprovider.template.contentvalue.annotation;
+package com.coalmine.contentprovider.template.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -1,4 +1,4 @@
-package com.coalmine.contentprovider.template.contentvalue;
+package com.coalmine.contentprovider.template;
 
 import android.content.ContentValues;
 

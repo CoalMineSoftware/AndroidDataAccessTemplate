@@ -2,6 +2,8 @@ package com.coalmine.contentprovider.template;
 
 import android.database.Cursor;
 
+
+/** Convenience methods for retrieving values from a {@link Cursor} by column name and/or accounting for null values. */
 public abstract class CursorUtils {
 	public static int getRequiredInteger(final Cursor cursor, final String columnName) {
 		return cursor.getInt(cursor.getColumnIndex(columnName));
