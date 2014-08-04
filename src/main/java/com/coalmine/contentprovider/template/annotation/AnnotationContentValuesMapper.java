@@ -7,12 +7,16 @@ import java.util.Set;
 import android.content.ContentValues;
 
 import com.coalmine.contentprovider.template.ContentValuesMapper;
+import com.coalmine.contentprovider.template.naming.DefaultNamingStrategy;
+import com.coalmine.contentprovider.template.naming.NamingStrategy;
 
 /** A {@link ContentValuesMapper} implementation that maps all of the model object's fields (including inherited
  * fields) that are annotated with {@link ContentValue}.  The field's {@link ContentValue#name()} is used as the key of
  * the value inserted into the generated ContentValues.  If a name is not provided, the field's name is used instead. */
 public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> { 
 	private Set<MappableField> mappableFields = new HashSet<MappableField>();
+	private NamingStrategy keyNamingStrategy = new DefaultNamingStrategy();
+
 
 	public AnnotationContentValuesMapper(Class<RowModel> modelClass) {
 		for(Class<?> currentClass=modelClass; !Object.class.equals(currentClass); currentClass=currentClass.getSuperclass()) {
@@ -26,7 +30,7 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 
 					String valueKey = contentValueAnnotation.name();
 					if(ContentValue.DEFAULT_NAME.equals(valueKey)) {
-						valueKey = field.getName();
+						valueKey = keyNamingStrategy.determineName(field.getName());
 					}
 
 					mappableFields.add(new MappableField(valueKey, field,
@@ -116,6 +120,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 		}
 
 		throw new IllegalArgumentException("Class must be one of the types allowed by ContentProvider.set().  Class was "+fieldClass.getSimpleName());
+	}
+
+	/** Sets the strategy used to determine the name under which a field's value is stored in a
+	 * ContentValues object when one is not specified on the field's {@link ContentValue}
+	 * annotation.  An instance of {@link DefaultNamingStrategy} is used by default. */
+	public void setKeyNamingStrategy(NamingStrategy keyNamingStrategy) {
+		this.keyNamingStrategy = keyNamingStrategy;
 	}
 
 
