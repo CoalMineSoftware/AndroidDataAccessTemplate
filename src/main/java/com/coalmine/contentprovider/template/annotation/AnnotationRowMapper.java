@@ -13,6 +13,11 @@ import com.coalmine.contentprovider.template.RowMapper;
 import com.coalmine.contentprovider.template.naming.DefaultNamingStrategy;
 import com.coalmine.contentprovider.template.naming.NamingStrategy;
 
+/** A {@link RowMapper} implementation that populates all of the model class's fields (including
+ * inherited fields) that are annotated with {@link Column}.  Each field's {@link Column#name()}
+ * value is used as name of the column from which the field will be populated.  If a name is
+ * not provided, the mapper's columnNamingStrategy is used to determine the corresponding column
+ * name based on the field's name. */
 public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 	private NamingStrategy columnNamingStrategy = new DefaultNamingStrategy();
 	private Set<MappedField> mappedFields = new HashSet<MappedField>();

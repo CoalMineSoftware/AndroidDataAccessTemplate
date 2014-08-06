@@ -11,9 +11,11 @@ import com.coalmine.contentprovider.template.DeclaredFieldIterator;
 import com.coalmine.contentprovider.template.naming.DefaultNamingStrategy;
 import com.coalmine.contentprovider.template.naming.NamingStrategy;
 
-/** A {@link ContentValuesMapper} implementation that maps all of the model object's fields (including inherited
- * fields) that are annotated with {@link Column}.  The field's {@link Column#name()} is used as the key of
- * the value inserted into the generated ContentValues.  If a name is not provided, the field's name is used instead. */
+/** A {@link ContentValuesMapper} implementation that maps all of the model object's fields
+ * (including inherited fields) that are annotated with {@link Column}.  The field's
+ * {@link Column#name()} is used as the key of the value inserted into the generated ContentValues.
+ * If a name is not provided, the mapper's keyNamingStrategy is used to determine the corresponding
+ * key name based on the field's name. */
 public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> { 
 	private Set<MappedField> mappedFields = new HashSet<MappedField>();
 	private NamingStrategy keyNamingStrategy = new DefaultNamingStrategy();
