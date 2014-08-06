@@ -7,45 +7,47 @@ import java.util.Set;
 import android.content.ContentValues;
 
 import com.coalmine.contentprovider.template.ContentValuesMapper;
+import com.coalmine.contentprovider.template.DeclaredFieldIterator;
 import com.coalmine.contentprovider.template.naming.DefaultNamingStrategy;
 import com.coalmine.contentprovider.template.naming.NamingStrategy;
 
 /** A {@link ContentValuesMapper} implementation that maps all of the model object's fields (including inherited
- * fields) that are annotated with {@link ContentValue}.  The field's {@link ContentValue#name()} is used as the key of
+ * fields) that are annotated with {@link Column}.  The field's {@link Column#name()} is used as the key of
  * the value inserted into the generated ContentValues.  If a name is not provided, the field's name is used instead. */
 public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> { 
-	private Set<MappableField> mappableFields = new HashSet<MappableField>();
+	private Set<MappedField> mappedFields = new HashSet<MappedField>();
 	private NamingStrategy keyNamingStrategy = new DefaultNamingStrategy();
 
 
 	public AnnotationContentValuesMapper(Class<RowModel> modelClass) {
-		for(Class<?> currentClass=modelClass; !Object.class.equals(currentClass); currentClass=currentClass.getSuperclass()) {
-			for(Field field : currentClass.getDeclaredFields()) {
-				if(field.isAnnotationPresent(ContentValue.class)) {
-					if(!field.isAccessible()) {
-						field.setAccessible(true);
-					}
+		DeclaredFieldIterator fieldIterator = new DeclaredFieldIterator(modelClass);
+		while(fieldIterator.hasNext()) {
+			Field field = fieldIterator.next();
 
-					ContentValue contentValueAnnotation = field.getAnnotation(ContentValue.class);
-
-					String valueKey = contentValueAnnotation.name();
-					if(ContentValue.DEFAULT_NAME.equals(valueKey)) {
-						valueKey = keyNamingStrategy.determineName(field.getName());
-					}
-
-					mappableFields.add(new MappableField(valueKey, field,
-							determineFieldMappingStrategyForClass(field.getType())));
+			if(field.isAnnotationPresent(Column.class)) {
+				if(!field.isAccessible()) {
+					field.setAccessible(true);
 				}
+
+				Column columnAnnotation = field.getAnnotation(Column.class);
+
+				String valueKey = columnAnnotation.name();
+				if(Column.DEFAULT_NAME.equals(valueKey)) {
+					valueKey = keyNamingStrategy.determineName(field.getName());
+				}
+
+				mappedFields.add(new MappedField(valueKey, field,
+						determineMappingStrategyForFieldType(field.getType())));
 			}
 		}
 	}
 
 	@Override
 	public ContentValues mapContentValues(RowModel rowModel) {
-		ContentValues contentValues = new ContentValues(mappableFields.size());
+		ContentValues contentValues = new ContentValues(mappedFields.size());
 
 		try {
-			for(MappableField mappableField : mappableFields) {
+			for(MappedField mappableField : mappedFields) {
 				mappableField.getMappingStrategy().mapField(rowModel, mappableField.getField(), contentValues, mappableField.getValueKey());
 			}
 		} catch(Exception e) {
@@ -55,17 +57,17 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 		return contentValues;
 	}
 
-	protected Set<MappableField> getMappableFields() {
-		return mappableFields;
+	protected Set<MappedField> getMappableFields() {
+		return mappedFields;
 	}
 
-	protected static class MappableField {
+	protected static class MappedField {
 		private String valueKey;
 		private Field field;
 		private FieldMappingStrategy mappingStrategy;
 
 
-		public MappableField(String valueKey, Field field, FieldMappingStrategy mappingStrategy) {
+		public MappedField(String valueKey, Field field, FieldMappingStrategy mappingStrategy) {
 			this.valueKey = valueKey;
 			this.field = field;
 			this.mappingStrategy = mappingStrategy;
@@ -84,7 +86,7 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 		}
 	}
 
-	protected static FieldMappingStrategy determineFieldMappingStrategyForClass(Class<?> fieldClass) {
+	protected static FieldMappingStrategy determineMappingStrategyForFieldType(Class<?> fieldClass) {
 		if(Boolean.class.isAssignableFrom(fieldClass)) {
 			return BooleanFieldMappingStrategy.getInstance();
 		} else if(boolean.class.isAssignableFrom(fieldClass)) {
@@ -123,8 +125,8 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	/** Sets the strategy used to determine the name under which a field's value is stored in a
-	 * ContentValues object when one is not specified on the field's {@link ContentValue}
-	 * annotation.  An instance of {@link DefaultNamingStrategy} is used by default. */
+	 * ContentValues object when one is not specified on the field's {@link Column} annotation.
+	 * An instance of {@link DefaultNamingStrategy} is used by default. */
 	public void setKeyNamingStrategy(NamingStrategy keyNamingStrategy) {
 		this.keyNamingStrategy = keyNamingStrategy;
 	}

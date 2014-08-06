@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * "some_field".  An underscore is inserted wherever an uppercase letter follows another letter,
  * regardless of case. This strategy ignores numbers in the input.  This allows conversions like
  * "strictI18n" to "strict_i18n" and "hemoglobinA1c" to "hemoglobin_a1c", while not handling
- * (arguably poor) names like "textInput2", which would be converted to "text_input2", not
+ * (arguably poor) names like "textInput2", which will be converted to "text_input2", not
  * "text_input_2". */
 public class UnderscoredNamingStrategy implements NamingStrategy {
 	private static final Pattern CASE_SWITCH_PATTERN = Pattern.compile("([a-zA-Z])(?=[A-Z])");

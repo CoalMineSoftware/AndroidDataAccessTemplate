@@ -24,7 +24,7 @@ import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesM
 import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapper.FloatFieldMappingStrategy;
 import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapper.IntegerFieldMappingStrategy;
 import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapper.LongFieldMappingStrategy;
-import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapper.MappableField;
+import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapper.MappedField;
 import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapper.PrimitiveBooleanFieldMappingStrategy;
 import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapper.PrimitiveByteArrayFieldMappingStrategy;
 import com.coalmine.contentprovider.template.annotation.AnnotationContentValuesMapper.PrimitiveByteFieldMappingStrategy;
@@ -87,12 +87,12 @@ public class AnnotationContentValuesMapperTest {
 
 	@Test
 	public void testConstructor() {
-		Set<MappableField> fields = mapper.getMappableFields();
+		Set<MappedField> fields = mapper.getMappableFields();
 
 		assertNotNull(fields);
 		assertEquals(12, fields.size());
 
-		Map<String,MappableField> fieldsByValueKey = buildMappableFieldsMapByValueKey(fields);
+		Map<String,MappedField> fieldsByValueKey = buildMappableFieldsMapByValueKey(fields);
 
 		// Fields from class that rely on the default
 		assertNotNull(fieldsByValueKey.get("privateField"));
@@ -116,47 +116,47 @@ public class AnnotationContentValuesMapperTest {
 	}
 
 	@Test
-	public void testDetermineFieldMappingStrategyForClass() {
+	public void testDetermineMappingStrategyForFieldType() {
 		assertThatMappingStrategyIsOfType(BooleanFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(Boolean.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(Boolean.class));
 		assertThatMappingStrategyIsOfType(PrimitiveBooleanFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(boolean.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(boolean.class));
 
 		assertThatMappingStrategyIsOfType(ByteFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(Byte.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(Byte.class));
 		assertThatMappingStrategyIsOfType(PrimitiveByteFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(byte.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(byte.class));
 
 		assertThatMappingStrategyIsOfType(PrimitiveByteArrayFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(byte[].class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(byte[].class));
 
 		assertThatMappingStrategyIsOfType(ShortFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(Short.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(Short.class));
 		assertThatMappingStrategyIsOfType(PrimitiveShortFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(short.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(short.class));
 
 		assertThatMappingStrategyIsOfType(IntegerFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(Integer.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(Integer.class));
 		assertThatMappingStrategyIsOfType(PrimitiveIntegerFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(int.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(int.class));
 
 		assertThatMappingStrategyIsOfType(LongFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(Long.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(Long.class));
 		assertThatMappingStrategyIsOfType(PrimitiveLongFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(long.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(long.class));
 
 		assertThatMappingStrategyIsOfType(FloatFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(Float.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(Float.class));
 		assertThatMappingStrategyIsOfType(PrimitiveFloatFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(float.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(float.class));
 
 		assertThatMappingStrategyIsOfType(DoubleFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(Double.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(Double.class));
 		assertThatMappingStrategyIsOfType(PrimitiveDoubleFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(double.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(double.class));
 
 		assertThatMappingStrategyIsOfType(StringFieldMappingStrategy.class,
-				AnnotationContentValuesMapper.determineFieldMappingStrategyForClass(String.class));
+				AnnotationContentValuesMapper.determineMappingStrategyForFieldType(String.class));
 	}
 
 
@@ -168,10 +168,10 @@ public class AnnotationContentValuesMapperTest {
 				expectedStrategyClass.isAssignableFrom(actualMappingStrategy.getClass()));
 	}
 
-	private static Map<String,MappableField> buildMappableFieldsMapByValueKey(Set<MappableField> fields) {
-		Map<String,MappableField> fieldsByValueKey = new HashMap<String,AnnotationContentValuesMapper.MappableField>(fields.size());
+	private static Map<String,MappedField> buildMappableFieldsMapByValueKey(Set<MappedField> fields) {
+		Map<String,MappedField> fieldsByValueKey = new HashMap<String,AnnotationContentValuesMapper.MappedField>(fields.size());
 
-		for(MappableField field : fields) {
+		for(MappedField field : fields) {
 			fieldsByValueKey.put(field.getValueKey(), field);
 		}
 

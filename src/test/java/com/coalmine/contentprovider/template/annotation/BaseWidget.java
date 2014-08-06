@@ -2,18 +2,18 @@ package com.coalmine.contentprovider.template.annotation;
 
 
 public class BaseWidget {
-	@ContentValue
+	@Column
 	private int privateBaseClassField;
-	@ContentValue
+	@Column
 	protected int protectedBaseClassField;
-	@ContentValue
+	@Column
 	public int publicBaseClassField;
 
-	@ContentValue(name="renamedPrivateBaseClassField")
+	@Column(name="renamedPrivateBaseClassField")
 	private int namedPrivateBaseClassField;
-	@ContentValue(name="renamedProtectedBaseClassField")
+	@Column(name="renamedProtectedBaseClassField")
 	protected int namedProtectedBaseClassField;
-	@ContentValue(name="renamedPublicBaseClassField")
+	@Column(name="renamedPublicBaseClassField")
 	public int namedPublicBaseClassField;
 
 	private int unmappedBaseClassField;

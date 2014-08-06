@@ -5,16 +5,20 @@ import android.database.Cursor;
 
 /** Convenience methods for retrieving values from a {@link Cursor} by column name and/or accounting for null values. */
 public abstract class CursorUtils {
-	public static int getRequiredInteger(final Cursor cursor, final String columnName) {
-		return cursor.getInt(cursor.getColumnIndex(columnName));
+	public static byte getRequiredByte(final Cursor cursor, final String columnName) {
+		return getRequiredByte(cursor, cursor.getColumnIndex(columnName));
 	}
 
-	public static Integer getInteger(final Cursor cursor, final String columnName) {
-		return getInteger(cursor, cursor.getColumnIndex(columnName));
+	public static byte getRequiredByte(final Cursor cursor, final int columnIndex) {
+		return (byte)cursor.getShort(columnIndex);
 	}
 
-	public static Integer getInteger(final Cursor cursor, final int columnIndex) {
-		return cursor.isNull(columnIndex)? null : cursor.getInt(columnIndex);
+	public static Byte getByte(final Cursor cursor, final String columnName) {
+		return getByte(cursor, cursor.getColumnIndex(columnName));
+	}
+
+	public static Byte getByte(final Cursor cursor, final int columnIndex) {
+		return cursor.isNull(columnIndex)? null : getRequiredByte(cursor, columnIndex);
 	}
 
 
@@ -28,6 +32,19 @@ public abstract class CursorUtils {
 
 	public static Short getShort(final Cursor cursor, final int columnIndex) {
 		return cursor.isNull(columnIndex)? null : cursor.getShort(columnIndex);
+	}
+
+
+	public static int getRequiredInteger(final Cursor cursor, final String columnName) {
+		return cursor.getInt(cursor.getColumnIndex(columnName));
+	}
+
+	public static Integer getInteger(final Cursor cursor, final String columnName) {
+		return getInteger(cursor, cursor.getColumnIndex(columnName));
+	}
+
+	public static Integer getInteger(final Cursor cursor, final int columnIndex) {
+		return cursor.isNull(columnIndex)? null : cursor.getInt(columnIndex);
 	}
 
 
