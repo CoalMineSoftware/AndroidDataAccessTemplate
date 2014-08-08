@@ -401,6 +401,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 			values.put(valueKey, (String)field.get(modelObject));
 		}
 	}
+
+	/** Convenience method for instantiating a mapper without having to provide
+	 * the row model class twice, as both a generic parameter and as a parameter
+	 * to {@link #AnnotationContentValuesMapper(Class)}. */
+	public static <Type> AnnotationContentValuesMapper<Type> forClass(Class<Type> rowModelType) {
+		return new AnnotationContentValuesMapper<Type>(rowModelType);
+	}
 }
 
 

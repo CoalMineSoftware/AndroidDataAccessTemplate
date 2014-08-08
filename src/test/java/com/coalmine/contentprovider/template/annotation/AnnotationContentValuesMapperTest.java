@@ -43,7 +43,7 @@ public class AnnotationContentValuesMapperTest {
 
 	@Before
 	public void setUp() throws Exception {
-		mapper = new AnnotationContentValuesMapper<Widget>(Widget.class);
+		mapper = AnnotationContentValuesMapper.forClass(Widget.class);
 	}
 
 	@Test

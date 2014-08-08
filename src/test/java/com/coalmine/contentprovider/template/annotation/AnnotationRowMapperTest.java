@@ -32,7 +32,7 @@ import com.coalmine.contentprovider.template.annotation.AnnotationRowMapper.Shor
 public class AnnotationRowMapperTest {
 	@Test
 	public void testMapRow() {
-		AnnotationRowMapper<Widget> mapper = new AnnotationRowMapper<Widget>(Widget.class);
+		AnnotationRowMapper<Widget> mapper = AnnotationRowMapper.forClass(Widget.class);
 
 		Widget widget = mapper.mapRow(buildCursor(), 0);
 
@@ -51,19 +51,34 @@ public class AnnotationRowMapperTest {
 		assertEquals(12, widget.getNamedPublicBaseClassField());
 	}
 
-	private static Cursor buildCursor() {
-		MatrixCursor cursor = new MatrixCursor(new String[] {
-				"privateField", "protectedField", "publicField",
-				"renamedPrivateField", "renamedProtectedField", "renamedPublicField",
-				"privateBaseClassField", "protectedBaseClassField", "publicBaseClassField",
-				"renamedPrivateBaseClassField", "renamedProtectedBaseClassField", "renamedPublicBaseClassField"
-		});
+	@Test
+	public void testMapRow_privateNoArgConstructorDoesNotCauseExceptionWhenOverridingConstructNewModelObject() {
+		AnnotationRowMapper<ClassWithoutPublicNoArgConstructor> mapper = new AnnotationRowMapper<ClassWithoutPublicNoArgConstructor>(ClassWithoutPublicNoArgConstructor.class) {
+			protected ClassWithoutPublicNoArgConstructor constructModelObject() {
+				// Returns an instance created with the model class's non-no-argument constructor
+				return new ClassWithoutPublicNoArgConstructor(0);
+			}
+		};
 
-		cursor.addRow(new Object[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+		ClassWithoutPublicNoArgConstructor instance = mapper.mapRow(buildCursor(), 0);
 
-		cursor.moveToFirst();
+		assertNotNull(instance);
+	}
 
-		return cursor;
+	@Test
+	public void testConstructNewModelObject() {
+		AnnotationRowMapper<Widget> mapper = AnnotationRowMapper.forClass(Widget.class);
+
+		Widget widget = mapper.constructModelObject();
+
+		assertNotNull("Expected an instance of the row model class to have been constructed via reflection.", widget);
+	}
+
+	@Test(expected=RuntimeException.class)
+	public void testConstructNewModelObject_withoutPublicConstructor() {
+		AnnotationRowMapper<ClassWithoutPublicNoArgConstructor> mapper = AnnotationRowMapper.forClass(ClassWithoutPublicNoArgConstructor.class);
+
+		mapper.constructModelObject();
 	}
 
 	@Test
@@ -107,12 +122,33 @@ public class AnnotationRowMapperTest {
 				AnnotationRowMapper.determineMappingStrategyForFieldType(long.class));
 	}
 
+	private static Cursor buildCursor() {
+		MatrixCursor cursor = new MatrixCursor(new String[] {
+				"privateField", "protectedField", "publicField",
+				"renamedPrivateField", "renamedProtectedField", "renamedPublicField",
+				"privateBaseClassField", "protectedBaseClassField", "publicBaseClassField",
+				"renamedPrivateBaseClassField", "renamedProtectedBaseClassField", "renamedPublicBaseClassField"
+		});
+
+		cursor.addRow(new Object[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
+
+		cursor.moveToFirst();
+
+		return cursor;
+	}
+
 	private static void assertThatMappingStrategyIsOfType(Class<? extends MappingStrategy> expectedStrategyClass, MappingStrategy actualMappingStrategy) {
 		assertNotNull("Mapping strategy instance expected",
 				actualMappingStrategy);
 
 		assertTrue("Expected mapping strategy to be of type"+expectedStrategyClass.getSimpleName(),
 				expectedStrategyClass.isAssignableFrom(actualMappingStrategy.getClass()));
+	}
+
+	/** Class without a no-argument constructor for AnnotationRowMapper to call, but with a second
+	 * constructor used when overriding {@link AnnotationRowMapper#constructModelObject()}. */
+	private static class ClassWithoutPublicNoArgConstructor {
+		public ClassWithoutPublicNoArgConstructor(int parameter) { }
 	}
 }
 

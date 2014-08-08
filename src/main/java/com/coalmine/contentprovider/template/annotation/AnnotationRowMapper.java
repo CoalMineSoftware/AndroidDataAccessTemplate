@@ -19,16 +19,13 @@ import com.coalmine.contentprovider.template.naming.NamingStrategy;
  * not provided, the mapper's columnNamingStrategy is used to determine the corresponding column
  * name based on the field's name. */
 public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
+	private Class<RowModel> rowModelClass;
 	private NamingStrategy columnNamingStrategy = new DefaultNamingStrategy();
 	private Set<MappedField> mappedFields = new HashSet<MappedField>();
 	private Constructor<RowModel> rowModelConstructor;
 
 	public AnnotationRowMapper(Class<RowModel> rowModelClass) {
-		try {
-			rowModelConstructor = rowModelClass.getConstructor();
-		} catch(Exception e) {
-			throw new IllegalArgumentException("The given class does not appear to have a public no-argument constructor", e);
-		}
+		this.rowModelClass = rowModelClass;
 
 		DeclaredFieldIterator fieldIterator = new DeclaredFieldIterator(rowModelClass);
 		while(fieldIterator.hasNext()) {
@@ -54,11 +51,15 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 
 	@Override
 	public RowModel mapRow(Cursor cursor, int rowNumber) {
-		RowModel model = newModelObject();
+		RowModel model = constructModelObject();
 
 		try {
 			for(MappedField mappedField : mappedFields) {
-				mappedField.getMappingStrategy().mapColumn(cursor, mappedField.getColumnName(), model, mappedField.getField());
+				mappedField.getMappingStrategy().mapColumn(
+						cursor,
+						mappedField.getColumnName(),
+						model,
+						mappedField.getField());
 			}
 		} catch(Exception e) {
 			throw new RuntimeException("An error occurred while populating model object from Cursor", e);
@@ -67,13 +68,33 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		return model;
 	}
 
-	/** @return A new instance of the row model class, instantiated using its default/no-argument constructor. */
-	protected RowModel newModelObject() {
+	/** Used to get a new instance of the mapper's row model, for each row in the {@link Cursor}
+	 * being mapped.  This method creates an instance via reflection, using the class's no argument
+	 * constructor.  Users may choose to override this method to instantiate an instance themselves
+	 * to avoid the performance penalty of using reflection. */
+	protected RowModel constructModelObject() {
 		try {
-			return rowModelConstructor.newInstance();
+			return getOrRetrieveRowModelConstructor().newInstance();
 		} catch(Exception e) {
 			throw new RuntimeException("Unable to instantiate instance of row model type, "+rowModelConstructor.getDeclaringClass(), e);
 		}
+	}
+
+	/** Because users may choose to override {@link #constructModelObject()} rather than relying
+	 * on reflection, the row model class's constructor is retrieved lazily, to avoid throwing a
+	 * {@link NoSuchMethodException} or {@link SecurityException} if the constructor will never
+	 * be used. This method returns the value of rowModelConstructor, first retrieving it if
+	 * necessary. */
+	private Constructor<RowModel> getOrRetrieveRowModelConstructor() {
+		if(rowModelConstructor == null) {
+			try {
+				rowModelConstructor = rowModelClass.getConstructor();
+			} catch(Exception e) {
+				throw new IllegalArgumentException("The row model class does not appear to have a public no-argument constructor", e);
+			}
+		}
+
+		return rowModelConstructor;
 	}
 
 	protected static MappingStrategy determineMappingStrategyForFieldType(Class<?> type) {
@@ -411,6 +432,13 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 
 			return instance;
 		}
+	}
+
+	/** Convenience method for instantiating an AnnotationRowMapper without having to provide the
+	 * row model class twice, as both a generic parameter and as a parameter to
+	 * {@link #AnnotationRowMapper(Class)}. */
+	public static <Type> AnnotationRowMapper<Type> forClass(Class<Type> rowModelClass) {
+		return new AnnotationRowMapper<Type>(rowModelClass);
 	}
 }
 

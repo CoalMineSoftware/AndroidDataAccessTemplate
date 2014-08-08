@@ -20,6 +20,9 @@ public class UnderscoredNamingStrategyTest {
 
 		String identifierWithConsecutiveCapitals = "abCDef";
 		assertEquals("ab_c_def", strategy.determineName(identifierWithConsecutiveCapitals));
+
+		String identifierWithNumber = "strictI18n";
+		assertEquals("strict_i18n", strategy.determineName(identifierWithNumber));
 	}
 }
 
