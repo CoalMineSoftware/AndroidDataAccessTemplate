@@ -5,6 +5,4 @@ Modeled after [Spring](http://spring.io/) JdbcTemplate, ContentProviderTemplate 
 
 The design of ContentProviderTemplate also encourages developers to separate object-building and ContentValues-building logic from other responsibilities that sometimes get intertwined with other data access code.  Developers are encouraged to write self-contained RowMapper/RowCallbackHandler implemenations for querying, and ContentValuesMapper implementations for inserting/updating.  Such mappers and handlers serve a single purpose and can potentially be reused throughout a project (or projects.)
 
-For convenience, the library provides simple RowMapper implementations for use when querying the value of a single column.
-
-There are even annotation-driven RowMapper and ContentValuesMapper implementations that allow you to map to and from your model classes by simply annotating fields that you want to be mapped.
+For convenience, the library provides simple RowMapper implementations for use when querying the value of a single column.  There are even annotation-driven mapper implementations (AnnotationRowMapper and AnnotationContentValuesMapper) that allow you to map to and from your model classes by simply annotating fields that you want the mapper to handle.
