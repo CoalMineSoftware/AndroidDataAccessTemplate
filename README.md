@@ -10,7 +10,7 @@ For convenience, the library provides simple RowMapper implementations for use w
 Note on Build Dependencies
 --------------------------
 
-As you might expect, the build for ContentProviderTemplate has dependencies on Android artifacts, including a transitive dependency on com.google.android:support-v4, which is quite out of date in [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.google.android%22).  In order to build the project locally, it's recommended that you use the Android SDK Manager to install the "Android Support Repository" package and update your system's ~/.m2/settings.xml file to include the local repository, like so:
+As you might expect, the build for ContentProviderTemplate has dependencies on Android artifacts, including a transitive dependency on com.google.android:support-v4, which is quite out of date on [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.google.android%22).  In order to build the project locally, it's recommended that you use the Android SDK Manager to install the "Android Support Repository" package and update your system's ~/.m2/settings.xml file to include the local repository.  For example:
 
     <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
