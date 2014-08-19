@@ -1,7 +1,9 @@
 package com.coalmine.contentprovider.template.annotation;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -10,6 +12,7 @@ import android.database.Cursor;
  * used with an {@link AnnotationContentValuesMapper}, or populated from a {@link Cursor} when the
  * enclosing class is used with an {@link AnnotationRowMapper}. */
 @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
 public @interface Column {
 	public static final String DEFAULT_NAME = "";
 
