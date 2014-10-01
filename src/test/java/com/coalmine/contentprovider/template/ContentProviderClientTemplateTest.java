@@ -1,6 +1,6 @@
 package com.coalmine.contentprovider.template;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -13,9 +13,11 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowContentProviderClient;
 import org.robolectric.shadows.ShadowContentResolver;
 
 import android.content.ContentProvider;
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -112,6 +114,21 @@ public class ContentProviderClientTemplateTest {
 
 		assertEquals(expectedValues,
 				processCursorValues);
+	}
+
+	@Test
+	public void testReleaseClient_clientIsReleased() {
+		ContentProviderClient client = resolver.acquireContentProviderClient(TestContentProvider.URI);
+		ShadowContentProviderClient clientShadow = Robolectric.shadowOf(client);
+
+		new ContentProviderClientTemplate(client).releaseClient();
+
+		assertTrue(clientShadow.isReleased());
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testReleaseClient_exceptionThrownWhenConstructedWithResolver() {
+		new ContentProviderClientTemplate(resolver).releaseClient();
 	}
 
 	private static Cursor buildSingleColumnCursor(String columnName, Object... rowValues) {
