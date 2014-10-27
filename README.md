@@ -7,6 +7,48 @@ The design of ContentProviderTemplate also encourages developers to separate obj
 
 For convenience, the library provides simple RowMapper implementations for use when querying the value of a single column.  There are even annotation-driven mapper implementations (AnnotationRowMapper and AnnotationContentValuesMapper) that allow you to map to and from your model classes by simply annotating fields that you want the mapper to handle.
 
+Example Usages
+--------------
+
+To query for a list of business objects, where each Cursor row corresponds to an instance of a given business object, write a mapper like so:
+
+    public class ContactRowMapper implements RowMapper<Contact> {
+        public static String[] REQUIRED_COLUMNS = new String[] { // Not required but a recommended best practice
+                ContactsContract.Contracts._ID,
+                ContactsContract.Contracts.DISPLAY_NAME_PRIMARY};
+        
+        @Override
+        public Contact mapRow(Cursor cursor, int rowNumber) {
+            Contact contact = new Contact();
+            
+            contact.setId(CursorUtils.getLong(cursor, ContactsContract.Contracts._ID));
+            contact.setDisplayName(CursorUtils.getString(cursor, ContactsContract.Contracts.DISPLAY_NAME_PRIMARY));
+            
+            return contact;
+        }
+    }
+
+Then construct a ContentProviderClientTemplate using either a ContentResolver or ContentProviderClient and use it to query a relevant URI:
+
+    List<Contact> contacts = new ContentProviderClientTemplate(resolver).queryForList(
+            ContactsContract.Contracts.CONTENT_URI,
+            WidgetRowMapper.REQUIRED_COLUMNS,
+            new WidgetRowMapper()) {
+
+Inserting and updating a ContentProvider works similarly, but using a ContentValuesMapper to generate ContentValues from a model object:
+
+    public class WidgetContentValuesMapper implements ContentValuesMapper<Widget> {
+        @Override
+        public ContentValues mapContentValues(Widget widget) {
+            ContentValues contentValues = new ContentValues();
+            
+            contentValues.put(valueKey, widget.getFoo());
+            contentValues.put(valueKey, widget.getBar());
+            
+            return contentValues;
+        }
+    }
+
 Note on Build Dependencies
 --------------------------
 
