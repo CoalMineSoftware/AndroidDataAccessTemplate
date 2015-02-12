@@ -31,9 +31,9 @@ To query for a list of business objects, where each Cursor row corresponds to an
 Then construct a ContentProviderClientTemplate using either a ContentResolver or ContentProviderClient and use it to query a relevant URI:
 
     List<Contact> contacts = new ContentProviderClientTemplate(resolver).queryForList(
-            ContactsContract.Contracts.CONTENT_URI,
-            WidgetRowMapper.REQUIRED_COLUMNS,
-            new WidgetRowMapper()) {
+            ContactsContract.Contacts.CONTENT_URI,
+            ContactRowMapper.REQUIRED_COLUMNS,
+            new ContactRowMapper()) {
 
 Inserting and updating a ContentProvider works similarly, but using a ContentValuesMapper to generate ContentValues from a model object:
 
