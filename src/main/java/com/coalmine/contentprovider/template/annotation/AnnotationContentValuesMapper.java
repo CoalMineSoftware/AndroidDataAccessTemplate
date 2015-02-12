@@ -12,7 +12,7 @@ import com.coalmine.contentprovider.template.naming.DefaultNamingStrategy;
 import com.coalmine.contentprovider.template.naming.NamingStrategy;
 
 /** A {@link ContentValuesMapper} implementation that maps all of the model object's fields
- * (including inherited fields) that are annotated with {@link Column}.  The field's
+ * (including inherited fields) that are annotated with {@link Column}.  A field's
  * {@link Column#name()} is used as the key of the value inserted into the generated ContentValues.
  * If a name is not provided, the mapper's keyNamingStrategy is used to determine the corresponding
  * key name based on the field's name. */
@@ -27,16 +27,11 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 			Field field = fieldIterator.next();
 
 			if(field.isAnnotationPresent(Column.class)) {
-				if(!field.isAccessible()) {
-					field.setAccessible(true);
-				}
+				makeFieldAccessible(field);
 
-				Column columnAnnotation = field.getAnnotation(Column.class);
-
-				String valueKey = columnAnnotation.name();
-				if(Column.DEFAULT_NAME.equals(valueKey)) {
-					valueKey = keyNamingStrategy.determineName(field.getName());
-				}
+				String valueKey = determineKey(
+						field.getAnnotation(Column.class).name(),
+						field.getName());
 
 				mappedFields.add(new MappedField(valueKey, field,
 						determineMappingStrategyForFieldType(field.getType())));
@@ -44,13 +39,28 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 		}
 	}
 
+	private void makeFieldAccessible(Field field) {
+		if(!field.isAccessible()) {
+			field.setAccessible(true);
+		}
+	}
+
+	/** Determines the name under which a Field's value will be stored in a ContentValues. */
+	private String determineKey(String annotatedName, String fieldName) {
+		return Column.DEFAULT_NAME.equals(annotatedName)?
+				keyNamingStrategy.determineName(fieldName) :
+				annotatedName;
+	}
+
 	@Override
 	public ContentValues mapContentValues(RowModel rowModel) {
 		ContentValues contentValues = new ContentValues(mappedFields.size());
 
 		try {
-			for(MappedField mappableField : mappedFields) {
-				mappableField.getMappingStrategy().mapField(rowModel, mappableField.getField(), contentValues, mappableField.getValueKey());
+			for(MappedField mappedField : mappedFields) {
+				mappedField.getMappingStrategy().mapField(
+						rowModel, mappedField.getField(),
+						contentValues, mappedField.getValueKey());
 			}
 		} catch(Exception e) {
 			throw new RuntimeException("An error occurred while populating ContentValues from model object: " + rowModel, e);

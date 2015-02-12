@@ -34,12 +34,13 @@ public class ContentProviderClientTemplate {
 	/** Constructs a template using a {@link ContentProviderClient}, to which <code>insert()</code>,
 	 * <code>query()</code> and <code>update()</code> calls are delegated.  Because the use of a
 	 * client avoids repeated {@link ContentProvider} lookups  and permission checks, developers
-	 * can expect to see better performance when constructing a template in this fashion.  However,
-	 * a client (and a template constructed with a client) can only insert/query/update URI's
-	 * handled by the provider for which the client was acquired. Clients also need to be released
-	 * when no longer needed, by calling {@link ContentProviderClient#release()}.  For convenience,
-	 * users can also call {@link #releaseClient()} on a ContentProviderClientTemplate constructed
-	 * with a ContentProviderClient. */
+	 * can expect to see better performance when constructing a template in this fashion.
+	 * <p/>
+	 * However, a client (and a template constructed with a client) can only insert/query/update
+	 * URI's handled by the provider for which the client was acquired. Clients also need to be
+	 * released when no longer needed, by calling {@link ContentProviderClient#release()}.  For
+	 * convenience, users can also call {@link #releaseClient()} on a ContentProviderClientTemplate
+	 * constructed with a ContentProviderClient. */
 	public ContentProviderClientTemplate(ContentProviderClient providerClient) {
 		providerQuerier = new ContentProviderClientQuerier(providerClient);
 	}
