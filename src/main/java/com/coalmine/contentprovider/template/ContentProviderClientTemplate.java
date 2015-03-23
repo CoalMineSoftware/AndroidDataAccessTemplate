@@ -1,6 +1,5 @@
 package com.coalmine.contentprovider.template;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentProvider;
@@ -16,9 +15,8 @@ import android.os.RemoteException;
  * reusable {@link RowMapper}s and {@link RowCallbackHandler}s for building business objects from
  * Cursor rows, and {@link ContentValuesMapper}s for generating {@link ContentValues} from business
  * objects. */
-public class ContentProviderClientTemplate {
+public class ContentProviderClientTemplate extends BaseClientTemplate {
 	private ContentProviderQuerier providerQuerier;
-
 
 	/** Constructs a template using a {@link ContentResolver}, to which <code>insert()</code>,
 	 * <code>query()</code> and <code>update()</code> calls are delegated.  Templates constructed
@@ -50,25 +48,15 @@ public class ContentProviderClientTemplate {
 	}
 
 	public <RowModel> RowModel query(Uri uri, String[] projection, String selectClause, String[] selectionArguments, String sortOrder, RowMapper<RowModel> rowMapper) {
-		RowModel queryResult = null;
-
 		Cursor cursor = null;
 		try {
 			cursor = providerQuerier.query(uri, projection, selectClause, selectionArguments, sortOrder);
-			if(cursor.moveToNext()) {
-				if(!cursor.isLast()) {
-					throw new IllegalArgumentException("Multiple rows returned for the given URI/query.");
-				}
-
-				queryResult = rowMapper.mapRow(cursor, 0);
-			}
+			return mapRow(cursor, rowMapper);
 		} finally {
 			if(cursor != null) {
 				cursor.close();
 			}
 		}
-
-		return queryResult;
 	}
 
 	public <RowModel> List<RowModel> queryForList(Uri uri, String[] projection, RowMapper<RowModel> rowMapper) {
@@ -76,22 +64,15 @@ public class ContentProviderClientTemplate {
 	}
 
 	public <RowModel> List<RowModel> queryForList(Uri uri, String[] projection, String selectClause, String[] selectionArguments, String sortOrder, RowMapper<RowModel> rowMapper) {
-		List<RowModel> queryResults = new ArrayList<RowModel>();
-
 		Cursor cursor = null;
 		try {
 			cursor = providerQuerier.query(uri, projection, selectClause, selectionArguments, sortOrder);
-			int rowNumber = 0;
-			while(cursor.moveToNext()) {
-				queryResults.add(rowMapper.mapRow(cursor, rowNumber++));
-			}
+			return mapRows(cursor, rowMapper);
 		} finally {
 			if(cursor != null) {
 				cursor.close();
 			}
 		}
-
-		return queryResults;
 	}
 
 	public void query(Uri uri, String[] projection, RowCallbackHandler callbackHandler) {
