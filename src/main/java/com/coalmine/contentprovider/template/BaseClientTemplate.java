@@ -28,4 +28,11 @@ public class BaseClientTemplate {
 
 		return queryResults;
 	}
+
+	protected void processRows(Cursor cursor, RowCallbackHandler callbackHandler) {
+		int rowNumber = 0;
+		while(cursor.moveToNext()) {
+			callbackHandler.processRow(cursor, rowNumber++);
+		}
+	}
 }
