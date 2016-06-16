@@ -28,6 +28,79 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		this.databaseRetriever = databaseRetriever;
 	}
 
+	/**
+	 * Executes the given callback's {@link TransactionCallback#doInTransaction(SQLiteDatabaseClientTemplate)} method
+	 * within a transaction with a writable database.
+	 */
+	public void performTransaction(TransactionCallback callback) {
+		SQLiteDatabase database = getWritableDatabase();
+
+		database.beginTransaction();
+		try {
+			callback.doInTransaction(this);
+			database.setTransactionSuccessful();
+		} finally {
+			database.endTransaction();
+		}
+	}
+
+	public <RowModel> RowModel rawQuery(String query, List<String> selectionArgs, RowMapper<RowModel> rowMapper) {
+		return rawQuery(query, toArray(selectionArgs), rowMapper);
+	}
+
+	public <RowModel> RowModel rawQuery(String query, String[] selectionArgs, RowMapper<RowModel> rowMapper) {
+		Cursor cursor = null;
+		try {
+			cursor = getReadableDatabase().rawQuery(query, selectionArgs);
+
+			return mapRow(cursor, rowMapper);
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
+	}
+
+	public <RowModel> List<RowModel> rawQueryForList(String query, List<String> selectionArgs, RowMapper<RowModel> rowMapper) {
+		return rawQueryForList(query, toArray(selectionArgs), rowMapper);
+	}
+
+	public <RowModel> List<RowModel> rawQueryForList(String query, String[] selectionArgs, RowMapper<RowModel> rowMapper) {
+		Cursor cursor = null;
+		try {
+			cursor = getReadableDatabase().rawQuery(query, selectionArgs);
+
+			return mapRows(cursor, rowMapper);
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
+	}
+
+	public  void rawQuery(String query, String[] selectionArgs, RowCallbackHandler callbackHandler) {
+		Cursor cursor = null;
+		try {
+			cursor = getReadableDatabase().rawQuery(query, selectionArgs);
+
+			processRows(cursor, callbackHandler);
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
+	}
+
+	public <RowModel> List<RowModel> queryForList(boolean distinct, String table, List<String> columns,
+			String selection, List<String> selectionArgs,
+			String groupBy, String having, String orderBy, String limit,
+			RowMapper<RowModel> rowMapper) {
+		return queryForList(distinct, table, toArray(columns),
+				selection, toArray(selectionArgs),
+				groupBy, having, orderBy, limit,
+				rowMapper);
+	}
+
 	public <RowModel> List<RowModel> queryForList(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -38,6 +111,18 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 				null, rowMapper);
 	}
 
+	public <RowModel> List<RowModel> queryForList(boolean distinct, String table, List<String> columns,
+			String selection, List<String> selectionArgs,
+			String groupBy, String having, String orderBy, String limit,
+			CancellationSignal cancellationSignal,
+			RowMapper<RowModel> rowMapper) {
+		return queryForList(distinct, table, toArray(columns),
+				selection, toArray(selectionArgs),
+				groupBy, having, orderBy, limit,
+				cancellationSignal,
+				rowMapper);
+	}
+
 	public <RowModel> List<RowModel> queryForList(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -45,7 +130,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 			RowMapper<RowModel> rowMapper) {
 		Cursor cursor = null;
 		try {
-			cursor = databaseRetriever.getReadableDatabase().query(distinct, table, columns,
+			cursor = getReadableDatabase().query(distinct, table, columns,
 					selection, selectionArgs,
 					groupBy, having, orderBy, limit,
 					cancellationSignal);
@@ -58,6 +143,16 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		}
 	}
 
+	public <RowModel> RowModel query(boolean distinct, String table, List<String> columns,
+			String selection, List<String> selectionArgs,
+			String groupBy,String having, String orderBy, String limit,
+			RowMapper<RowModel> rowMapper) {
+		return query(distinct, table, toArray(columns),
+				selection, toArray(selectionArgs),
+				groupBy, having, orderBy, limit,
+				rowMapper);
+	}
+
 	public <RowModel> RowModel query(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy,String having, String orderBy, String limit,
@@ -68,6 +163,18 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 				null, rowMapper);
 	}
 
+	public <RowModel> RowModel query(boolean distinct, String table, List<String> columns,
+			String selection, List<String> selectionArgs,
+			String groupBy, String having, String orderBy, String limit,
+			CancellationSignal cancellationSignal,
+			RowMapper<RowModel> rowMapper) {
+		return query(distinct, table, toArray(columns),
+				selection, toArray(selectionArgs),
+				groupBy, having, orderBy, limit,
+				cancellationSignal,
+				rowMapper);
+	}
+
 	public <RowModel> RowModel query(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -75,7 +182,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 			RowMapper<RowModel> rowMapper) {
 		Cursor cursor = null;
 		try {
-			cursor = databaseRetriever.getReadableDatabase().query(distinct, table, columns,
+			cursor = getReadableDatabase().query(distinct, table, columns,
 					selection, selectionArgs,
 					groupBy, having, orderBy, limit,
 					cancellationSignal);
@@ -88,6 +195,16 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		}
 	}
 
+	public void query(boolean distinct, String table, List<String> columns,
+			String selection, List<String> selectionArgs,
+			String groupBy, String having, String orderBy, String limit,
+			RowCallbackHandler callbackHandler) {
+		query(distinct, table, toArray(columns),
+				selection, toArray(selectionArgs),
+				groupBy, having, orderBy, limit,
+				callbackHandler);
+	}
+
 	public void query(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -98,6 +215,18 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 				null, callbackHandler);
 	}
 
+	public void query(boolean distinct, String table, List<String> columns,
+			String selection, List<String> selectionArgs,
+			String groupBy, String having, String orderBy, String limit,
+			CancellationSignal cancellationSignal,
+			RowCallbackHandler callbackHandler) {
+		query(distinct, table, toArray(columns),
+				selection, toArray(selectionArgs),
+				groupBy, having, orderBy, limit,
+				cancellationSignal,
+				callbackHandler);
+	}
+
 	public void query(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -105,7 +234,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 			RowCallbackHandler callbackHandler) {
 		Cursor cursor = null;
 		try {
-			cursor = databaseRetriever.getReadableDatabase().query(distinct, table, columns,
+			cursor = getReadableDatabase().query(distinct, table, columns,
 					selection, selectionArgs,
 					groupBy, having, orderBy, limit,
 					cancellationSignal);
@@ -119,7 +248,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 	}
 
 	public <RowModel> long insert(String table, RowModel rowObject, ContentValuesMapper<RowModel> mapper) {
-		return databaseRetriever.getWritableDatabase().insertOrThrow(
+		return getWritableDatabase().insertOrThrow(
 				table,
 				null,
 				mapper.mapContentValues(rowObject));
@@ -127,7 +256,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 
 	public <RowModel> long insert(String table, RowModel rowObject, ContentValuesMapper<RowModel> mapper,
 			ConflictAlgorithm conflictAlgorithm) {
-		return databaseRetriever.getWritableDatabase().insertWithOnConflict(
+		return getWritableDatabase().insertWithOnConflict(
 				table,
 				null,
 				mapper.mapContentValues(rowObject),
@@ -135,8 +264,14 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 	}
 
 	public <RowModel> int update(String table, RowModel rowObject, ContentValuesMapper<RowModel> mapper,
+			String whereClause, List<String> selectionArguments) {
+		return update(table, rowObject, mapper,
+				whereClause, toArray(selectionArguments));
+	}
+
+	public <RowModel> int update(String table, RowModel rowObject, ContentValuesMapper<RowModel> mapper,
 			String whereClause, String[] selectionArguments) {
-		return databaseRetriever.getWritableDatabase().update(
+		return getWritableDatabase().update(
 				table,
 				mapper.mapContentValues(rowObject),
 				whereClause,
@@ -144,8 +279,14 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 	}
 
 	public <RowModel> int update(String table, RowModel rowObject, ContentValuesMapper<RowModel> mapper,
+			String whereClause, List<String> selectionArguments, ConflictAlgorithm conflictAlgorithm) {
+		return update(table, rowObject, mapper,
+				whereClause, toArray(selectionArguments), conflictAlgorithm);
+	}
+
+	public <RowModel> int update(String table, RowModel rowObject, ContentValuesMapper<RowModel> mapper,
 			String whereClause, String[] selectionArguments, ConflictAlgorithm conflictAlgorithm) {
-		return databaseRetriever.getWritableDatabase().updateWithOnConflict(
+		return getWritableDatabase().updateWithOnConflict(
 				table,
 				mapper.mapContentValues(rowObject),
 				whereClause,
@@ -153,13 +294,26 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 				conflictAlgorithm.getConstant());
 	}
 
+	public int delete(String table, String whereClause, List<String> selectionArguments) {
+		return delete(table, whereClause, toArray(selectionArguments));
+	}
+
 	public int delete(String table, String whereClause, String[] selectionArguments) {
-		return databaseRetriever.getWritableDatabase().delete(
+		return getWritableDatabase().delete(
 				table,
 				whereClause,
 				selectionArguments);
 	}
 
+	protected SQLiteDatabase getReadableDatabase() {
+		return databaseRetriever.getReadableDatabase();
+	}
+
+	protected SQLiteDatabase getWritableDatabase() {
+		return databaseRetriever.getWritableDatabase();
+	}
+
+	/* Enum wrapper for the "CONFLICT_" integer constants defined by SQLiteDatabase. */
 	public enum ConflictAlgorithm {
 		ABORT(SQLiteDatabase.CONFLICT_ABORT),
 		FAIL(SQLiteDatabase.CONFLICT_FAIL),
@@ -179,6 +333,10 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		}
 	}
 
+	/**
+	 * Abstraction for obtaining a SQLiteDatabase. This is intended to be implemented by API users
+	 * when using a SQLitDatabase that's not managed by a SQLiteOpenHelper.
+	 */
 	public interface DatabaseRetriever {
 		SQLiteDatabase getReadableDatabase();
 		SQLiteDatabase getWritableDatabase();

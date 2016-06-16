@@ -4,11 +4,11 @@
 
 	<groupId>com.coalmine</groupId>
 	<artifactId>content-provider-template</artifactId>
-	<version>1.3.0</version>
+	<version>1.4.0</version>
 	<packaging>jar</packaging>
 
 	<name>content-provider-template</name>
-	<url>https://github.com/coalminesoftware/ContentProviderTemplate</url>
+	<url>https://github.com/CoalMineSoftware/ContentProviderTemplate</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,6 +1,8 @@
+
 package com.coalmine.contentprovider.template;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import android.database.Cursor;
@@ -34,5 +36,11 @@ public class BaseClientTemplate {
 		while(cursor.moveToNext()) {
 			callbackHandler.processRow(cursor, rowNumber++);
 		}
+	}
+
+	protected static String[] toArray(Collection<String> strings) {
+		return strings == null?
+				null :
+				strings.toArray(new String[strings.size()]);
 	}
 }
