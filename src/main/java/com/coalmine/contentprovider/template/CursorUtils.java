@@ -128,6 +128,10 @@ public abstract class CursorUtils {
 	public static byte[] getBlob(final Cursor cursor, final int columnIndex) {
 		return cursor.isNull(columnIndex)? null : cursor.getBlob(columnIndex);
 	}
+
+	public static boolean isNull(final Cursor cursor, final String columnName) {
+		return cursor.isNull(cursor.getColumnIndex(columnName));
+	} 
 }
 
 
