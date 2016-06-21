@@ -78,6 +78,10 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		}
 	}
 
+	public void rawQuery(String query, List<String> selectionArgs, RowCallbackHandler callbackHandler) {
+		rawQuery(query, toArray(selectionArgs), callbackHandler);
+	}
+
 	public  void rawQuery(String query, String[] selectionArgs, RowCallbackHandler callbackHandler) {
 		Cursor cursor = null;
 		try {
