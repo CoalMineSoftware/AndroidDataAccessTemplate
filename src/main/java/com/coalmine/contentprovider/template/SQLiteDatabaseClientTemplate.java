@@ -109,10 +109,18 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
 			RowMapper<RowModel> rowMapper) {
-		return queryForList(distinct, table, columns,
-				selection, selectionArgs,
-				groupBy, having, orderBy, limit,
-				null, rowMapper);
+		Cursor cursor = null;
+		try {
+			cursor = getReadableDatabase().query(distinct, table, columns,
+					selection, selectionArgs,
+					groupBy, having, orderBy, limit);
+
+			return mapRows(cursor, rowMapper);
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
 	}
 
 	public <RowModel> List<RowModel> queryForList(boolean distinct, String table, List<String> columns,
@@ -161,10 +169,18 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 			String selection, String[] selectionArgs,
 			String groupBy,String having, String orderBy, String limit,
 			RowMapper<RowModel> rowMapper) {
-		return query(distinct, table, columns,
-				selection, selectionArgs,
-				groupBy, having, orderBy, limit,
-				null, rowMapper);
+		Cursor cursor = null;
+		try {
+			cursor = getReadableDatabase().query(distinct, table, columns,
+					selection, selectionArgs,
+					groupBy, having, orderBy, limit);
+
+			return mapRow(cursor, rowMapper);
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
 	}
 
 	public <RowModel> RowModel query(boolean distinct, String table, List<String> columns,
@@ -213,10 +229,18 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
 			RowCallbackHandler callbackHandler) {
-		query(distinct, table, columns,
-				selection, selectionArgs,
-				groupBy, having, orderBy, limit,
-				null, callbackHandler);
+		Cursor cursor = null;
+		try {
+			cursor = getReadableDatabase().query(distinct, table, columns,
+					selection, selectionArgs,
+					groupBy, having, orderBy, limit);
+
+			processRows(cursor, callbackHandler);
+		} finally {
+			if(cursor != null) {
+				cursor.close();
+			}
+		}
 	}
 
 	public void query(boolean distinct, String table, List<String> columns,

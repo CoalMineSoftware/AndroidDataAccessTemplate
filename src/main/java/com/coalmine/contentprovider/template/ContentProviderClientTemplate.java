@@ -38,7 +38,7 @@ public class ContentProviderClientTemplate extends BaseClientTemplate {
 	 * <code>query()</code> and <code>update()</code> calls are delegated.  Because the use of a
 	 * client avoids repeated {@link ContentProvider} lookups  and permission checks, developers
 	 * can expect to see better performance when constructing a template in this fashion.
-	 * <p/>
+	 * <p>
 	 * However, a client (and a template constructed with a client) can only insert/query/update
 	 * URI's handled by the provider for which the client was acquired. Clients also need to be
 	 * released when no longer needed, by calling {@link ContentProviderClient#release()}.  For
