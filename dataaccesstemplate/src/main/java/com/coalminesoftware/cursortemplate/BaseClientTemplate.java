@@ -1,4 +1,3 @@
-
 package com.coalminesoftware.cursortemplate;
 
 import java.util.ArrayList;

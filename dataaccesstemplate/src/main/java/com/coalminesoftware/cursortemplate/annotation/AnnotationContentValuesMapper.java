@@ -7,18 +7,20 @@ import java.util.Set;
 import android.content.ContentValues;
 
 import com.coalminesoftware.cursortemplate.ContentValuesMapper;
-import com.coalminesoftware.cursortemplate.DeclaredFieldIterator;
+import com.coalminesoftware.cursortemplate.util.DeclaredFieldIterator;
 import com.coalminesoftware.cursortemplate.naming.DefaultNamingStrategy;
 import com.coalminesoftware.cursortemplate.naming.NamingStrategy;
 
-/** A {@link ContentValuesMapper} implementation that maps all of the model object's fields
+/**
+ * A {@link ContentValuesMapper} implementation that maps all of the model object's fields
  * (including inherited fields) that are annotated with {@link Column}.  A field's
  * {@link Column#name()} is used as the key of the value inserted into the generated ContentValues.
  * If a name is not provided, the mapper's keyNamingStrategy is used to determine the corresponding
- * key name based on the field's name. */
+ * key name based on the field's name.
+ */
 public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMapper<RowModel> {
 	private Set<MappedField> mMappedFields = new HashSet<>();
-	private NamingStrategy keyNamingStrategy = new DefaultNamingStrategy();
+	private NamingStrategy mKeyNamingStrategy = new DefaultNamingStrategy();
 
 	public AnnotationContentValuesMapper(Class<RowModel> modelClass) {
 		DeclaredFieldIterator fieldIterator = new DeclaredFieldIterator(modelClass);
@@ -47,7 +49,7 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	/** Determines the name under which a Field's value will be stored in a ContentValues. */
 	private String determineKey(String annotatedName, String fieldName) {
 		return Column.DEFAULT_NAME.equals(annotatedName)?
-				keyNamingStrategy.determineName(fieldName) :
+				mKeyNamingStrategy.determineName(fieldName) :
 				annotatedName;
 	}
 
@@ -73,27 +75,27 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class MappedField {
-		private String valueKey;
-		private Field field;
-		private FieldMappingStrategy mappingStrategy;
+		private String mValueKey;
+		private Field mField;
+		private FieldMappingStrategy mMappingStrategy;
 
 
 		public MappedField(String valueKey, Field field, FieldMappingStrategy mappingStrategy) {
-			this.valueKey = valueKey;
-			this.field = field;
-			this.mappingStrategy = mappingStrategy;
+			mValueKey = valueKey;
+			mField = field;
+			mMappingStrategy = mappingStrategy;
 		}
 
 		public String getValueKey() {
-			return valueKey;
+			return mValueKey;
 		}
 
 		public Field getField() {
-			return field;
+			return mField;
 		}
 
 		public FieldMappingStrategy getMappingStrategy() {
-			return mappingStrategy;
+			return mMappingStrategy;
 		}
 	}
 
@@ -135,11 +137,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 		throw new IllegalArgumentException("Class must be one of the types allowed by ContentProvider.set().  Class was "+fieldClass.getSimpleName());
 	}
 
-	/** Sets the strategy used to determine the name under which a field's value is stored in a
+	/**
+	 * Sets the strategy used to determine the name under which a field's value is stored in a
 	 * ContentValues object when one is not specified on the field's {@link Column} annotation.
-	 * An instance of {@link DefaultNamingStrategy} is used by default. */
+	 * An instance of {@link DefaultNamingStrategy} is used by default.
+	 */
 	public void setKeyNamingStrategy(NamingStrategy keyNamingStrategy) {
-		this.keyNamingStrategy = keyNamingStrategy;
+		mKeyNamingStrategy = keyNamingStrategy;
 	}
 
 
@@ -156,13 +160,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class PrimitiveBooleanFieldMappingStrategy implements FieldMappingStrategy {
-		private static PrimitiveBooleanFieldMappingStrategy instance;
+		private static PrimitiveBooleanFieldMappingStrategy sInstance;
 
 		public static PrimitiveBooleanFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new PrimitiveBooleanFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveBooleanFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -172,13 +176,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class BooleanFieldMappingStrategy implements FieldMappingStrategy {
-		private static BooleanFieldMappingStrategy instance;
+		private static BooleanFieldMappingStrategy sInstance;
 
 		public static BooleanFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new BooleanFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new BooleanFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -188,13 +192,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class PrimitiveByteFieldMappingStrategy implements FieldMappingStrategy {
-		private static PrimitiveByteFieldMappingStrategy instance;
+		private static PrimitiveByteFieldMappingStrategy sInstance;
 
 		public static PrimitiveByteFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new PrimitiveByteFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveByteFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -204,13 +208,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class ByteFieldMappingStrategy implements FieldMappingStrategy {
-		private static ByteFieldMappingStrategy instance;
+		private static ByteFieldMappingStrategy sInstance;
 
 		public static ByteFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new ByteFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new ByteFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -220,13 +224,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class PrimitiveByteArrayFieldMappingStrategy implements FieldMappingStrategy {
-		private static PrimitiveByteArrayFieldMappingStrategy instance;
+		private static PrimitiveByteArrayFieldMappingStrategy sInstance;
 
 		public static PrimitiveByteArrayFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new PrimitiveByteArrayFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveByteArrayFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -236,13 +240,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class PrimitiveFloatFieldMappingStrategy implements FieldMappingStrategy {
-		private static PrimitiveFloatFieldMappingStrategy instance;
+		private static PrimitiveFloatFieldMappingStrategy sInstance;
 
 		public static PrimitiveFloatFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new PrimitiveFloatFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveFloatFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -252,13 +256,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class FloatFieldMappingStrategy implements FieldMappingStrategy {
-		private static FloatFieldMappingStrategy instance;
+		private static FloatFieldMappingStrategy sInstance;
 
 		public static FloatFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new FloatFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new FloatFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -268,13 +272,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class PrimitiveDoubleFieldMappingStrategy implements FieldMappingStrategy {
-		private static PrimitiveDoubleFieldMappingStrategy instance;
+		private static PrimitiveDoubleFieldMappingStrategy sInstance;
 
 		public static PrimitiveDoubleFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new PrimitiveDoubleFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveDoubleFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -284,13 +288,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class DoubleFieldMappingStrategy implements FieldMappingStrategy {
-		private static DoubleFieldMappingStrategy instance;
+		private static DoubleFieldMappingStrategy sInstance;
 
 		public static DoubleFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new DoubleFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new DoubleFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -300,13 +304,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class PrimitiveShortFieldMappingStrategy implements FieldMappingStrategy {
-		private static PrimitiveShortFieldMappingStrategy instance;
+		private static PrimitiveShortFieldMappingStrategy sInstance;
 
 		public static PrimitiveShortFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new PrimitiveShortFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveShortFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -316,13 +320,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class ShortFieldMappingStrategy implements FieldMappingStrategy {
-		private static ShortFieldMappingStrategy instance;
+		private static ShortFieldMappingStrategy sInstance;
 
 		public static ShortFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new ShortFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new ShortFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -332,13 +336,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class PrimitiveIntegerFieldMappingStrategy implements FieldMappingStrategy {
-		private static PrimitiveIntegerFieldMappingStrategy instance;
+		private static PrimitiveIntegerFieldMappingStrategy sInstance;
 
 		public static PrimitiveIntegerFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new PrimitiveIntegerFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveIntegerFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -348,13 +352,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class IntegerFieldMappingStrategy implements FieldMappingStrategy {
-		private static IntegerFieldMappingStrategy instance;
+		private static IntegerFieldMappingStrategy sInstance;
 
 		public static IntegerFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new IntegerFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new IntegerFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -364,13 +368,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class PrimitiveLongFieldMappingStrategy implements FieldMappingStrategy {
-		private static PrimitiveLongFieldMappingStrategy instance;
+		private static PrimitiveLongFieldMappingStrategy sInstance;
 
 		public static PrimitiveLongFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new PrimitiveLongFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveLongFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -380,13 +384,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class LongFieldMappingStrategy implements FieldMappingStrategy {
-		private static LongFieldMappingStrategy instance;
+		private static LongFieldMappingStrategy sInstance;
 
 		public static LongFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new LongFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new LongFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -396,13 +400,13 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	}
 
 	protected static class StringFieldMappingStrategy implements FieldMappingStrategy {
-		private static StringFieldMappingStrategy instance;
+		private static StringFieldMappingStrategy sInstance;
 
 		public static StringFieldMappingStrategy getInstance() {
-			if(instance==null) {
-				instance = new StringFieldMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new StringFieldMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 
 		@Override
@@ -415,6 +419,6 @@ public class AnnotationContentValuesMapper<RowModel> implements ContentValuesMap
 	 * the row model class twice, as both a generic parameter and as a parameter
 	 * to {@link #AnnotationContentValuesMapper(Class)}. */
 	public static <Type> AnnotationContentValuesMapper<Type> forClass(Class<Type> rowModelType) {
-		return new AnnotationContentValuesMapper<Type>(rowModelType);
+		return new AnnotationContentValuesMapper<>(rowModelType);
 	}
 }

@@ -6,14 +6,14 @@ import com.coalminesoftware.cursortemplate.CursorUtils;
 import com.coalminesoftware.cursortemplate.RowMapper;
 
 public class NamedColumnIntegerRowMapper implements RowMapper<Integer> {
-	private String columnName;
+	private String mColumnName;
 
 	public NamedColumnIntegerRowMapper(String columnName) {
-		this.columnName = columnName;
+		mColumnName = columnName;
 	}
 
 	@Override
 	public Integer mapRow(Cursor cursor, int rowNumber) {
-		return CursorUtils.getInteger(cursor, columnName);
+		return CursorUtils.getInteger(cursor, mColumnName);
 	}
 }

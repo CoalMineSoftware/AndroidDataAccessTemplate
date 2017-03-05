@@ -2,8 +2,11 @@ package com.coalminesoftware.cursortemplate;
 
 import android.database.Cursor;
 
-
-/** Convenience methods for retrieving values from a {@link Cursor} by column name and/or accounting for null values. */
+/**
+ * Defines convenience methods for retrieving values from a {@link Cursor}. Most methods are for
+ * retrieving a value by name in a more concise way, or retrieving nullable values in a way that
+ * Java developers might be more likely to expect.
+ */
 public abstract class CursorUtils {
 	public static byte getRequiredByte(final Cursor cursor, final String columnName) {
 		return getRequiredByte(cursor, cursor.getColumnIndex(columnName));

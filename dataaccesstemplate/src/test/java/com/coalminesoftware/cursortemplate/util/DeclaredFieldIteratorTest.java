@@ -1,10 +1,11 @@
-package com.coalminesoftware.cursortemplate;
+package com.coalminesoftware.cursortemplate.util;
 
 import com.coalminesoftware.cursortemplate.annotation.Widget;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,27 +16,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class DeclaredFieldIteratorTest {
-	/** All of the columns that are known to exist in Widget and its descendants (excluding Object.) */
-	private static final Set<String> WIDGET_FIELD_NAMES = new HashSet<>();
+	/** All of the columns that are known to exist in Widget and its ancestors (excluding Object.) */
+	private static final Set<String> WIDGET_FIELD_NAMES = buildWidgetFieldNameSet();
 
 	private DeclaredFieldIterator fieldIterator;
-
-	static {
-		WIDGET_FIELD_NAMES.add("privateField");
-		WIDGET_FIELD_NAMES.add("protectedField");
-		WIDGET_FIELD_NAMES.add("publicField");
-		WIDGET_FIELD_NAMES.add("namedPrivateField");
-		WIDGET_FIELD_NAMES.add("namedProtectedField");
-		WIDGET_FIELD_NAMES.add("namedPublicField");
-		WIDGET_FIELD_NAMES.add("unmappedField");
-		WIDGET_FIELD_NAMES.add("privateBaseClassField");
-		WIDGET_FIELD_NAMES.add("protectedBaseClassField");
-		WIDGET_FIELD_NAMES.add("publicBaseClassField");
-		WIDGET_FIELD_NAMES.add("namedPrivateBaseClassField");
-		WIDGET_FIELD_NAMES.add("namedProtectedBaseClassField");
-		WIDGET_FIELD_NAMES.add("namedPublicBaseClassField");
-		WIDGET_FIELD_NAMES.add("unmappedBaseClassField");
-	}
 
 	@Before
 	public void setup() {
@@ -44,9 +28,9 @@ public class DeclaredFieldIteratorTest {
 
 	@Test
 	public void testConstructor() {
-		assertEquals(Widget.class, fieldIterator.currentClass);
-		assertArrayEquals(Widget.class.getDeclaredFields(), fieldIterator.currentClassFields);
-		assertEquals(1, fieldIterator.currentFieldIndex);
+		assertEquals(Widget.class, fieldIterator.mCurrentClass);
+		assertArrayEquals(Widget.class.getDeclaredFields(), fieldIterator.mCurrentClassFields);
+		assertEquals(1, fieldIterator.mCurrentFieldIndex);
 		assertNotNull(fieldIterator.nextField);
 	}
 
@@ -78,5 +62,26 @@ public class DeclaredFieldIteratorTest {
 	@Test(expected=UnsupportedOperationException.class)
 	public void testRemove() {
 		fieldIterator.remove();
+	}
+
+	private static Set<String> buildWidgetFieldNameSet() {
+		Set<String> names = new HashSet<>();
+
+		names.add("privateField");
+		names.add("protectedField");
+		names.add("publicField");
+		names.add("namedPrivateField");
+		names.add("namedProtectedField");
+		names.add("namedPublicField");
+		names.add("unmappedField");
+		names.add("privateBaseClassField");
+		names.add("protectedBaseClassField");
+		names.add("publicBaseClassField");
+		names.add("namedPrivateBaseClassField");
+		names.add("namedProtectedBaseClassField");
+		names.add("namedPublicBaseClassField");
+		names.add("unmappedBaseClassField");
+
+		return Collections.unmodifiableSet(names);
 	}
 }

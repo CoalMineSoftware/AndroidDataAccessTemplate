@@ -6,16 +6,14 @@ import com.coalminesoftware.cursortemplate.CursorUtils;
 import com.coalminesoftware.cursortemplate.RowMapper;
 
 public class NamedColumnDoubleRowMapper implements RowMapper<Double> {
-	private String columnName;
+	private String mColumnName;
 
 	public NamedColumnDoubleRowMapper(String columnName) {
-		this.columnName = columnName;
+		mColumnName = columnName;
 	}
 
 	@Override
 	public Double mapRow(Cursor cursor, int rowNumber) {
-		return CursorUtils.getDouble(cursor, columnName);
+		return CursorUtils.getDouble(cursor, mColumnName);
 	}
 }
-
-

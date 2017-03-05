@@ -5,7 +5,9 @@ import java.util.List;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build.VERSION_CODES;
 import android.os.CancellationSignal;
+import android.support.annotation.RequiresApi;
 
 import com.coalminesoftware.cursortemplate.BaseClientTemplate;
 import com.coalminesoftware.cursortemplate.ContentValuesMapper;
@@ -13,7 +15,7 @@ import com.coalminesoftware.cursortemplate.RowCallbackHandler;
 import com.coalminesoftware.cursortemplate.RowMapper;
 
 public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
-	private DatabaseRetriever databaseRetriever;
+	private DatabaseRetriever mDatabaseRetriever;
 
 	/**
 	 * Constructs a SQLiteDatabaseClientTemplate that operates on the database provided by the given
@@ -30,12 +32,12 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 	 * {@link #SQLiteDatabaseClientTemplate(SQLiteOpenHelper)}.
 	 */
 	public SQLiteDatabaseClientTemplate(DatabaseRetriever databaseRetriever) {
-		this.databaseRetriever = databaseRetriever;
+		mDatabaseRetriever = databaseRetriever;
 	}
 
 	/**
-	 * Executes the given callback's {@link TransactionCallback#doInTransaction(SQLiteDatabaseClientTemplate)} method
-	 * within a transaction with a writable database.
+	 * Executes the given callback's {@link TransactionCallback#doInTransaction(SQLiteDatabaseClientTemplate)}
+	 * method within a transaction with a writable database.
 	 */
 	public void performTransaction(TransactionCallback callback) {
 		SQLiteDatabase database = getWritableDatabase();
@@ -128,6 +130,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		}
 	}
 
+	@RequiresApi(api = VERSION_CODES.JELLY_BEAN)
 	public <RowModel> List<RowModel> queryForList(boolean distinct, String table, List<String> columns,
 			String selection, List<String> selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -140,6 +143,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 				rowMapper);
 	}
 
+	@RequiresApi(api = VERSION_CODES.JELLY_BEAN)
 	public <RowModel> List<RowModel> queryForList(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -188,6 +192,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		}
 	}
 
+	@RequiresApi(api = VERSION_CODES.JELLY_BEAN)
 	public <RowModel> RowModel query(boolean distinct, String table, List<String> columns,
 			String selection, List<String> selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -200,6 +205,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 				rowMapper);
 	}
 
+	@RequiresApi(api = VERSION_CODES.JELLY_BEAN)
 	public <RowModel> RowModel query(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -248,6 +254,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		}
 	}
 
+	@RequiresApi(api = VERSION_CODES.JELLY_BEAN)
 	public void query(boolean distinct, String table, List<String> columns,
 			String selection, List<String> selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -260,6 +267,7 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 				callbackHandler);
 	}
 
+	@RequiresApi(api = VERSION_CODES.JELLY_BEAN)
 	public void query(boolean distinct, String table, String[] columns,
 			String selection, String[] selectionArgs,
 			String groupBy, String having, String orderBy, String limit,
@@ -339,11 +347,11 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 	}
 
 	protected SQLiteDatabase getReadableDatabase() {
-		return databaseRetriever.getReadableDatabase();
+		return mDatabaseRetriever.getReadableDatabase();
 	}
 
 	protected SQLiteDatabase getWritableDatabase() {
-		return databaseRetriever.getWritableDatabase();
+		return mDatabaseRetriever.getWritableDatabase();
 	}
 
 	/* Enum wrapper for the "CONFLICT_" integer constants defined by SQLiteDatabase. */
@@ -355,14 +363,14 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 		REPLACE(SQLiteDatabase.CONFLICT_REPLACE),
 		ROLLBACK(SQLiteDatabase.CONFLICT_ROLLBACK);
 
-		private final int constant;
+		private final int mConstant;
 
-		private ConflictAlgorithm(int constant) {
-			this.constant = constant;
+		ConflictAlgorithm(int constant) {
+			mConstant = constant;
 		}
 
 		public int getConstant() {
-			return constant;
+			return mConstant;
 		}
 	}
 
@@ -376,20 +384,20 @@ public class SQLiteDatabaseClientTemplate extends BaseClientTemplate {
 	}
 
 	private static class SQLiteOpenHelperDatabaseRetriever implements DatabaseRetriever {
-		private SQLiteOpenHelper openHelper;
+		private SQLiteOpenHelper mOpenHelper;
 
 		public SQLiteOpenHelperDatabaseRetriever(SQLiteOpenHelper openHelper) {
-			this.openHelper = openHelper;
+			mOpenHelper = openHelper;
 		}
 
 		@Override
 		public SQLiteDatabase getReadableDatabase() {
-			return openHelper.getReadableDatabase();
+			return mOpenHelper.getReadableDatabase();
 		}
 
 		@Override
 		public SQLiteDatabase getWritableDatabase() {
-			return openHelper.getWritableDatabase();
+			return mOpenHelper.getWritableDatabase();
 		}
 	}
 }

@@ -1,31 +1,33 @@
 package com.coalminesoftware.cursortemplate.annotation;
 
+import android.database.Cursor;
+
+import com.coalminesoftware.cursortemplate.CursorUtils;
+import com.coalminesoftware.cursortemplate.util.DeclaredFieldIterator;
+import com.coalminesoftware.cursortemplate.RowMapper;
+import com.coalminesoftware.cursortemplate.naming.DefaultNamingStrategy;
+import com.coalminesoftware.cursortemplate.naming.NamingStrategy;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
-import android.database.Cursor;
-
-import com.coalminesoftware.cursortemplate.CursorUtils;
-import com.coalminesoftware.cursortemplate.DeclaredFieldIterator;
-import com.coalminesoftware.cursortemplate.RowMapper;
-import com.coalminesoftware.cursortemplate.naming.DefaultNamingStrategy;
-import com.coalminesoftware.cursortemplate.naming.NamingStrategy;
-
-/** A {@link RowMapper} implementation that populates all of the model class's fields (including
+/**
+ * A {@link RowMapper} implementation that populates all of the model class's fields (including
  * inherited fields) that are annotated with {@link Column}.  Each field's {@link Column#name()}
  * value is used as name of the column from which the field will be populated.  If a name is
  * not provided, the mapper's columnNamingStrategy is used to determine the corresponding column
- * name based on the field's name. */
+ * name based on the field's name.
+ */
 public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
-	private Class<RowModel> rowModelClass;
-	private NamingStrategy columnNamingStrategy = new DefaultNamingStrategy();
-	private Set<MappedField> mappedFields = new HashSet<MappedField>();
-	private Constructor<RowModel> rowModelConstructor;
+	private Class<RowModel> mRowModelClass;
+	private NamingStrategy mColumnNamingStrategy = new DefaultNamingStrategy();
+	private Set<MappedField> mMappedFields = new HashSet<>();
+	private Constructor<RowModel> mRowModelConstructor;
 
 	public AnnotationRowMapper(Class<RowModel> rowModelClass) {
-		this.rowModelClass = rowModelClass;
+		mRowModelClass = rowModelClass;
 
 		DeclaredFieldIterator fieldIterator = new DeclaredFieldIterator(rowModelClass);
 		while(fieldIterator.hasNext()) {
@@ -40,10 +42,10 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 
 				String columnName = columnAnnotation.name();
 				if(Column.DEFAULT_NAME.equals(columnName)) {
-					columnName = columnNamingStrategy.determineName(field.getName());
+					columnName = mColumnNamingStrategy.determineName(field.getName());
 				}
 
-				mappedFields.add(new MappedField(columnName, field,
+				mMappedFields.add(new MappedField(columnName, field,
 						determineMappingStrategyForFieldType(field.getType())));
 			}
 		}
@@ -54,7 +56,7 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		RowModel model = constructModelObject();
 
 		try {
-			for(MappedField mappedField : mappedFields) {
+			for(MappedField mappedField : mMappedFields) {
 				mappedField.getMappingStrategy().mapColumn(
 						cursor,
 						mappedField.getColumnName(),
@@ -68,33 +70,38 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		return model;
 	}
 
-	/** Used to get a new instance of the mapper's row model, for each row in the {@link Cursor}
+	/**
+	 * Used to get a new instance of the mapper's row model, for each row in the {@link Cursor}
 	 * being mapped.  This method creates an instance via reflection, using the class's no argument
 	 * constructor.  Users may choose to override this method to instantiate an instance themselves
-	 * to avoid the performance penalty of using reflection. */
+	 * to avoid the performance penalty of using reflection.
+	 */
 	protected RowModel constructModelObject() {
 		try {
 			return getOrRetrieveRowModelConstructor().newInstance();
 		} catch(Exception e) {
-			throw new RuntimeException("Unable to instantiate instance of row model type, "+rowModelConstructor.getDeclaringClass(), e);
+			throw new RuntimeException("Unable to instantiate instance of row model type, " +
+					mRowModelConstructor.getDeclaringClass(), e);
 		}
 	}
 
-	/** Because users may choose to override {@link #constructModelObject()} rather than relying
+	/**
+	 * Because users may choose to override {@link #constructModelObject()} rather than relying
 	 * on reflection, the row model class's constructor is retrieved lazily, to avoid throwing a
 	 * {@link NoSuchMethodException} or {@link SecurityException} if the constructor will never
 	 * be used. This method returns the value of rowModelConstructor, first retrieving it if
-	 * necessary. */
+	 * necessary.
+	 */
 	private Constructor<RowModel> getOrRetrieveRowModelConstructor() {
-		if(rowModelConstructor == null) {
+		if(mRowModelConstructor == null) {
 			try {
-				rowModelConstructor = rowModelClass.getConstructor();
+				mRowModelConstructor = mRowModelClass.getConstructor();
 			} catch(Exception e) {
 				throw new IllegalArgumentException("The row model class does not appear to have a public no-argument constructor", e);
 			}
 		}
 
-		return rowModelConstructor;
+		return mRowModelConstructor;
 	}
 
 	protected static MappingStrategy determineMappingStrategyForFieldType(Class<?> type) {
@@ -136,26 +143,26 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 	}
 
 	private static class MappedField {
-		private String columnName;
-		private Field field;
-		private MappingStrategy mappingStrategy;
+		private String mColumnName;
+		private Field mField;
+		private MappingStrategy mMappingStrategy;
 	
 		public MappedField(String columnName, Field field, MappingStrategy mappingStrategy) {
-			this.columnName = columnName;
-			this.field = field;
-			this.mappingStrategy = mappingStrategy;
+			mColumnName = columnName;
+			mField = field;
+			mMappingStrategy = mappingStrategy;
 		}
 
 		public String getColumnName() {
-			return columnName;
+			return mColumnName;
 		}
 
 		public Field getField() {
-			return field;
+			return mField;
 		}
 
 		public MappingStrategy getMappingStrategy() {
-			return mappingStrategy;
+			return mMappingStrategy;
 		}
 	}
 
@@ -164,7 +171,7 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 	}
 
 	protected static class BooleanMappingStrategy implements MappingStrategy {
-		private static BooleanMappingStrategy instance;
+		private static BooleanMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -172,15 +179,15 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static BooleanMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new BooleanMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new BooleanMappingStrategy();
 			}
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class PrimitiveBooleanMappingStrategy implements MappingStrategy {
-		private static PrimitiveBooleanMappingStrategy instance;
+		private static PrimitiveBooleanMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -188,16 +195,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static PrimitiveBooleanMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new PrimitiveBooleanMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveBooleanMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class ByteMappingStrategy implements MappingStrategy {
-		private static ByteMappingStrategy instance;
+		private static ByteMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -205,16 +212,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static ByteMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new ByteMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new ByteMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class PrimitiveByteMappingStrategy implements MappingStrategy {
-		private static PrimitiveByteMappingStrategy instance;
+		private static PrimitiveByteMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -222,16 +229,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static PrimitiveByteMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new PrimitiveByteMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveByteMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class PrimitiveByteArrayMappingStrategy implements MappingStrategy {
-		private static PrimitiveByteArrayMappingStrategy instance;
+		private static PrimitiveByteArrayMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -239,16 +246,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static PrimitiveByteArrayMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new PrimitiveByteArrayMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveByteArrayMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class FloatMappingStrategy implements MappingStrategy {
-		private static FloatMappingStrategy instance;
+		private static FloatMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -256,16 +263,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static FloatMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new FloatMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new FloatMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class PrimitiveFloatMappingStrategy implements MappingStrategy {
-		private static PrimitiveFloatMappingStrategy instance;
+		private static PrimitiveFloatMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -273,16 +280,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static PrimitiveFloatMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new PrimitiveFloatMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveFloatMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class DoubleMappingStrategy implements MappingStrategy {
-		private static DoubleMappingStrategy instance;
+		private static DoubleMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -290,16 +297,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static DoubleMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new DoubleMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new DoubleMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class PrimitiveDoubleMappingStrategy implements MappingStrategy {
-		private static PrimitiveDoubleMappingStrategy instance;
+		private static PrimitiveDoubleMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -307,16 +314,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static PrimitiveDoubleMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new PrimitiveDoubleMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveDoubleMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class ShortMappingStrategy implements MappingStrategy {
-		private static ShortMappingStrategy instance;
+		private static ShortMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -324,16 +331,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static ShortMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new ShortMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new ShortMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class PrimitiveShortMappingStrategy implements MappingStrategy {
-		private static PrimitiveShortMappingStrategy instance;
+		private static PrimitiveShortMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -341,16 +348,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static PrimitiveShortMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new PrimitiveShortMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveShortMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class IntegerMappingStrategy implements MappingStrategy {
-		private static IntegerMappingStrategy instance;
+		private static IntegerMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -358,16 +365,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static IntegerMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new IntegerMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new IntegerMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class PrimitiveIntegerMappingStrategy implements MappingStrategy {
-		private static PrimitiveIntegerMappingStrategy instance;
+		private static PrimitiveIntegerMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -375,16 +382,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static PrimitiveIntegerMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new PrimitiveIntegerMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveIntegerMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class LongMappingStrategy implements MappingStrategy {
-		private static LongMappingStrategy instance;
+		private static LongMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -392,16 +399,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static LongMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new LongMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new LongMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class PrimitiveLongMappingStrategy implements MappingStrategy {
-		private static PrimitiveLongMappingStrategy instance;
+		private static PrimitiveLongMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -409,16 +416,16 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static PrimitiveLongMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new PrimitiveLongMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new PrimitiveLongMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
 	protected static class StringMappingStrategy implements MappingStrategy {
-		private static StringMappingStrategy instance;
+		private static StringMappingStrategy sInstance;
 
 		@Override
 		public void mapColumn(Cursor cursor, String columnName, Object modelObject, Field field) throws IllegalArgumentException, IllegalAccessException {
@@ -426,20 +433,20 @@ public class AnnotationRowMapper<RowModel> implements RowMapper<RowModel> {
 		}
 
 		public static StringMappingStrategy getInstance() {
-			if(instance == null) {
-				instance = new StringMappingStrategy();
+			if(sInstance == null) {
+				sInstance = new StringMappingStrategy();
 			}
 
-			return instance;
+			return sInstance;
 		}
 	}
 
-	/** Convenience method for instantiating an AnnotationRowMapper without having to provide the
+	/**
+	 * Convenience method for instantiating an AnnotationRowMapper without having to provide the
 	 * row model class twice, as both a generic parameter and as a parameter to
-	 * {@link #AnnotationRowMapper(Class)}. */
+	 * {@link #AnnotationRowMapper(Class)}.
+	 */
 	public static <Type> AnnotationRowMapper<Type> forClass(Class<Type> rowModelClass) {
-		return new AnnotationRowMapper<Type>(rowModelClass);
+		return new AnnotationRowMapper<>(rowModelClass);
 	}
 }
-
-

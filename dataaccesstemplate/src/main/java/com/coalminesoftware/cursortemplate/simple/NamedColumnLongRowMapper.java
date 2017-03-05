@@ -6,16 +6,14 @@ import com.coalminesoftware.cursortemplate.CursorUtils;
 import com.coalminesoftware.cursortemplate.RowMapper;
 
 public class NamedColumnLongRowMapper implements RowMapper<Long> {
-	private String columnName;
+	private String mColumnName;
 
 	public NamedColumnLongRowMapper(String columnName) {
-		this.columnName = columnName;
+		mColumnName = columnName;
 	}
 
 	@Override
 	public Long mapRow(Cursor cursor, int rowNumber) {
-		return CursorUtils.getLong(cursor, columnName);
+		return CursorUtils.getLong(cursor, mColumnName);
 	}
 }
-
-

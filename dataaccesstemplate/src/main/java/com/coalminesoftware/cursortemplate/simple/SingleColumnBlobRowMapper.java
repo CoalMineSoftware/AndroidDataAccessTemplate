@@ -11,5 +11,3 @@ public class SingleColumnBlobRowMapper implements RowMapper<byte[]> {
 		return CursorUtils.getBlob(cursor, 0);
 	}
 }
-
-

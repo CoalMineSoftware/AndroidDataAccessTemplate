@@ -1,23 +1,23 @@
-package com.coalminesoftware.cursortemplate;
+package com.coalminesoftware.cursortemplate.util;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
 
-/** Iterator that iterates over all of the given Class's declared Fields, including inherited ones. */
+/** Iterator that iterates over all of the given Class's declared fields, including inherited ones. */
 public class DeclaredFieldIterator implements Iterator<Field> {
 	protected Field nextField;
 
-	protected Class<?> currentClass;
-	protected Field[] currentClassFields;
-	protected int currentFieldIndex;
+	protected Class<?> mCurrentClass;
+	protected Field[] mCurrentClassFields;
+	protected int mCurrentFieldIndex;
 
 	public DeclaredFieldIterator(Class<?> currentClass) {
 		if(currentClass == null) {
 			throw new IllegalArgumentException("A class is required to iterate over");
 		}
 
-		this.currentClass = currentClass;
-		currentClassFields = currentClass.getDeclaredFields();
+		mCurrentClass = currentClass;
+		mCurrentClassFields = currentClass.getDeclaredFields();
 
 		advanceToNextField();
 	}
@@ -41,9 +41,9 @@ public class DeclaredFieldIterator implements Iterator<Field> {
 	}
 
 	protected void advanceToNextField() {
-		while(!Object.class.equals(currentClass)) {
-			if(currentFieldIndex < currentClassFields.length) {
-				nextField = currentClassFields[currentFieldIndex++];
+		while(!Object.class.equals(mCurrentClass)) {
+			if(mCurrentFieldIndex < mCurrentClassFields.length) {
+				nextField = mCurrentClassFields[mCurrentFieldIndex++];
 				return;
 			}
 
@@ -54,10 +54,8 @@ public class DeclaredFieldIterator implements Iterator<Field> {
 	}
 
 	protected void advanceToNextAncestor() {
-		currentClass = currentClass.getSuperclass();
-		currentClassFields = currentClass.getDeclaredFields();
-		currentFieldIndex = 0;
+		mCurrentClass = mCurrentClass.getSuperclass();
+		mCurrentClassFields = mCurrentClass.getDeclaredFields();
+		mCurrentFieldIndex = 0;
 	}
 }
-
-

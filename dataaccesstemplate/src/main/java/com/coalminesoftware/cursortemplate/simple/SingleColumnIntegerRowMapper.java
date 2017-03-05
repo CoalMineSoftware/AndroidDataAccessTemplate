@@ -11,5 +11,3 @@ public class SingleColumnIntegerRowMapper implements RowMapper<Integer> {
 		return CursorUtils.getInteger(cursor, 0);
 	}
 }
-
-

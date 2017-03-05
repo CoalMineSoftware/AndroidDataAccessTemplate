@@ -11,5 +11,3 @@ public class SingleColumnShortRowMapper implements RowMapper<Short> {
 		return CursorUtils.getShort(cursor, 0);
 	}
 }
-
-

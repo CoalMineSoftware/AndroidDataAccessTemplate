@@ -11,5 +11,3 @@ public class SingleColumnDoubleRowMapper implements RowMapper<Double> {
 		return CursorUtils.getDouble(cursor, 0);
 	}
 }
-
-

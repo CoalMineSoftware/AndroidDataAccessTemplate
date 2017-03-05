@@ -11,5 +11,3 @@ public class SingleColumnStringRowMapper implements RowMapper<String> {
 		return CursorUtils.getString(cursor, 0);
 	}
 }
-
-

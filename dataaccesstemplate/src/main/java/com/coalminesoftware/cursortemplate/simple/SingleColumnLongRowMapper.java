@@ -11,5 +11,3 @@ public class SingleColumnLongRowMapper implements RowMapper<Long> {
 		return CursorUtils.getLong(cursor, 0);
 	}
 }
-
-

@@ -3,9 +3,9 @@ package com.coalminesoftware.cursortemplate.naming;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-/** Naming strategy that converts the given name (which is assumed to use camel case) to
- * underscore-delimited lower case.  For example, an input of "someField" would return
- * "some_field".
+/**
+ * Naming strategy that converts the given name (which is assumed to use camel case) to
+ * underscore-delimited lower case.  For example, an input of "someField" would return "some_field".
  * <p>
  * An underscore is inserted after any letter, regardless of case, that is followed by an uppercase
  * letter. This strategy ignores numbers in the input.  This allows conversions like "strictI18n"
@@ -20,5 +20,3 @@ public class UnderscoredNamingStrategy implements NamingStrategy {
 				.toLowerCase(Locale.ROOT);
 	}
 }
-
-

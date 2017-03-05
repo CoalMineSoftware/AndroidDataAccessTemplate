@@ -11,5 +11,3 @@ public class SingleColumnByteRowMapper implements RowMapper<Byte> {
 		return CursorUtils.getByte(cursor, 0);
 	}
 }
-
-

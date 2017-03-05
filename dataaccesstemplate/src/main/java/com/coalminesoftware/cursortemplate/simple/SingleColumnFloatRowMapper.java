@@ -11,5 +11,3 @@ public class SingleColumnFloatRowMapper implements RowMapper<Float> {
 		return CursorUtils.getFloat(cursor, 0);
 	}
 }
-
-

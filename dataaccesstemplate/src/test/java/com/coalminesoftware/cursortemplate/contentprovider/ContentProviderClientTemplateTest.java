@@ -127,14 +127,14 @@ public class ContentProviderClientTemplateTest {
 		ContentProviderClient client = resolver.acquireContentProviderClient(TestContentProvider.URI);
 		ShadowContentProviderClient clientShadow = Shadows.shadowOf(client);
 
-		new ContentProviderClientTemplate(client).releaseClient();
+		new ContentProviderClientTemplate(client).closeClient();
 
 		assertTrue(clientShadow.isReleased());
 	}
 
 	@Test(expected=IllegalStateException.class)
 	public void testReleaseClient_exceptionThrownWhenConstructedWithResolver() {
-		new ContentProviderClientTemplate(resolver).releaseClient();
+		new ContentProviderClientTemplate(resolver).closeClient();
 	}
 
 	private static Cursor buildSingleColumnCursor(String columnName, Object... rowValues) {
@@ -157,11 +157,11 @@ public class ContentProviderClientTemplateTest {
 				.build();
 
 
-		private Cursor queryCursor;
+		private Cursor mQueryCursor;
 
 		@Override
 		public boolean onCreate() {
-			queryCursor = null;
+			mQueryCursor = null;
 
 			return true;
 		}
@@ -179,7 +179,7 @@ public class ContentProviderClientTemplateTest {
 
 		@Override
 		public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-			return queryCursor;
+			return mQueryCursor;
 		}
 
 		@Override
@@ -194,7 +194,7 @@ public class ContentProviderClientTemplateTest {
 		}
 
 		public void setQueryCursor(Cursor queryCursor) {
-			this.queryCursor = queryCursor;
+			mQueryCursor = queryCursor;
 		}
 	}
 }

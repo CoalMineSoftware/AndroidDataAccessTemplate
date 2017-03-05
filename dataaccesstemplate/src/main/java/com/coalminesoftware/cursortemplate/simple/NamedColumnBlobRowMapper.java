@@ -6,16 +6,14 @@ import com.coalminesoftware.cursortemplate.CursorUtils;
 import com.coalminesoftware.cursortemplate.RowMapper;
 
 public class NamedColumnBlobRowMapper implements RowMapper<byte[]> {
-	private String columnName;
+	private String mColumnName;
 
 	public NamedColumnBlobRowMapper(String columnName) {
-		this.columnName = columnName;
+		mColumnName = columnName;
 	}
 
 	@Override
 	public byte[] mapRow(Cursor cursor, int rowNumber) {
-		return CursorUtils.getBlob(cursor, columnName);
+		return CursorUtils.getBlob(cursor, mColumnName);
 	}
 }
-
-

@@ -15,6 +15,8 @@ import com.coalminesoftware.cursortemplate.ContentValuesMapper;
 import com.coalminesoftware.cursortemplate.RowCallbackHandler;
 import com.coalminesoftware.cursortemplate.RowMapper;
 
+import static com.coalminesoftware.cursortemplate.util.DeprecationUtil.hasAndroidN;
+
 /**
  * Providers a simpler API for developers to interact with {@link ContentProvider}s, eliminating
  * much of the boilerplate code.  The design also encouraging developers to write self-contained,
@@ -47,7 +49,7 @@ public class ContentProviderClientTemplate extends BaseClientTemplate {
 	 * However, a client (and a template constructed with a client) can only insert/query/update
 	 * URI's handled by the provider for which the client was acquired. Clients also need to be
 	 * released when no longer needed, by calling {@link ContentProviderClient#release()}.  For
-	 * convenience, users can also call {@link #releaseClient()} on a ContentProviderClientTemplate
+	 * convenience, users can also call {@link #closeClient()} on a ContentProviderClientTemplate
 	 * constructed with a ContentProviderClient.
 	 */
 	public ContentProviderClientTemplate(ContentProviderClient providerClient) {
@@ -138,18 +140,27 @@ public class ContentProviderClientTemplate extends BaseClientTemplate {
 		return providerQuerier.delete(uri, whereClause, selectionArguments);
 	}
 
-	/** For templates that were constructed with a provider client, this convenience method
-	 * releases the client once it is no longer needed, by calling
-	 * {@link ContentProviderClient#release()}.
+	/**
+	 * For templates that were constructed with a provider client, this convenience method releases
+	 * the client once it is no longer needed, by calling {@link ContentProviderClient#close()} on
+	 * Android 24+, or {@link ContentProviderClient#release()} on previous Android releases.
 	 * 
-	 * @return True if this was released or false if it was already released.
-	 *  @throws IllegalStateException Thrown if the template does not wrap a ContentProviderClient.
-	 *  @see ContentProviderClientTemplate#ContentProviderClientTemplate(ContentProviderClient) */
-	public boolean releaseClient() {
+	 * @throws IllegalStateException Thrown if the template does not wrap a ContentProviderClient.
+	 * @see ContentProviderClientTemplate#ContentProviderClientTemplate(ContentProviderClient) */
+	public void closeClient() {
 		if(providerQuerier instanceof ContentProviderClientQuerier) {
-			return ((ContentProviderClientQuerier)providerQuerier).providerClient.release();
+			close(((ContentProviderClientQuerier)providerQuerier).mProviderClient);
 		} else {
 			throw new IllegalStateException("Template was not constructed with ContentProviderClient to release.");
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private static void close(ContentProviderClient client) {
+		if(hasAndroidN()) {
+			client.close();
+		} else {
+			client.release();
 		}
 	}
 
@@ -162,52 +173,52 @@ public class ContentProviderClientTemplate extends BaseClientTemplate {
 	}
 
 	private static class ContentResolverQuerier implements ContentProviderQuerier {
-		ContentResolver contentResolver;
+		ContentResolver mContentResolver;
 
 		public ContentResolverQuerier(ContentResolver contentResolver) {
 			if(contentResolver == null) {
 				throw new IllegalArgumentException("A resolver is required.");
 			}
 
-			this.contentResolver = contentResolver;
+			mContentResolver = contentResolver;
 		}
 
 		@Override
 		public Uri insert(Uri uri, ContentValues contentValues) {
-			return contentResolver.insert(uri, contentValues);
+			return mContentResolver.insert(uri, contentValues);
 		}
 
 		@Override
 		public Cursor query(Uri uri, String[] projection, String selectClause, String[] selectionArguments, String sortOrder) {
-			return contentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
+			return mContentResolver.query(uri, projection, selectClause, selectionArguments, sortOrder);
 		}
 
 		@Override
 		public int update(Uri uri, ContentValues contentValues, String whereClause, String[] selectionArguments) {
-			return contentResolver.update(uri, contentValues, whereClause, selectionArguments);
+			return mContentResolver.update(uri, contentValues, whereClause, selectionArguments);
 		}
 
 		@Override
 		public int delete(Uri uri, String whereClause, String[] selectionArguments) {
-			return contentResolver.delete(uri, whereClause, selectionArguments);
+			return mContentResolver.delete(uri, whereClause, selectionArguments);
 		}
 	}
 
 	private static class ContentProviderClientQuerier implements ContentProviderQuerier {
-		ContentProviderClient providerClient;
+		ContentProviderClient mProviderClient;
 
 		public ContentProviderClientQuerier(ContentProviderClient providerClient) {
 			if(providerClient == null) {
 				throw new IllegalArgumentException("A client is required.");
 			}
 
-			this.providerClient = providerClient;
+			mProviderClient = providerClient;
 		}
 
 		@Override
 		public Uri insert(Uri uri, ContentValues contentValues) {
 			try {
-				return providerClient.insert(uri, contentValues);
+				return mProviderClient.insert(uri, contentValues);
 			} catch (RemoteException e) {
 				throw new RuntimeException("Underying ContentProviderClient could not insert values.", e);
 			}
@@ -216,7 +227,7 @@ public class ContentProviderClientTemplate extends BaseClientTemplate {
 		@Override
 		public Cursor query(Uri uri, String[] projection, String selectClause, String[] selectionArguments, String sortOrder) {
 			try {
-				return providerClient.query(uri, projection, selectClause, selectionArguments, sortOrder);
+				return mProviderClient.query(uri, projection, selectClause, selectionArguments, sortOrder);
 			} catch (RemoteException e) {
 				throw new RuntimeException("Underying ContentProviderClient could not be queried.", e);
 			}
@@ -225,7 +236,7 @@ public class ContentProviderClientTemplate extends BaseClientTemplate {
 		@Override
 		public int update(Uri uri, ContentValues contentValues, String whereClause, String[] selectionArguments) {
 			try {
-				return providerClient.update(uri, contentValues, whereClause, selectionArguments);
+				return mProviderClient.update(uri, contentValues, whereClause, selectionArguments);
 			} catch (RemoteException e) {
 				throw new RuntimeException("Underying ContentProviderClient could not update values.", e);
 			}
@@ -234,7 +245,7 @@ public class ContentProviderClientTemplate extends BaseClientTemplate {
 		@Override
 		public int delete(Uri uri, String whereClause, String[] selectionArguments) {
 			try {
-				return providerClient.delete(uri, whereClause, selectionArguments);
+				return mProviderClient.delete(uri, whereClause, selectionArguments);
 			} catch (RemoteException e) {
 				throw new RuntimeException("Underying ContentProviderClient could not delete the record.", e);
 			}

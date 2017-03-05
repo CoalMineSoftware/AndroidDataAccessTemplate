@@ -6,15 +6,15 @@ import com.coalminesoftware.cursortemplate.CursorUtils;
 import com.coalminesoftware.cursortemplate.RowMapper;
 
 public class NamedColumnBooleanRowMapper implements RowMapper<Boolean> {
-	private String columnName;
+	private String mColumnName;
 
 	public NamedColumnBooleanRowMapper(String columnName) {
-		this.columnName = columnName;
+		mColumnName = columnName;
 	}
 
 	@Override
 	public Boolean mapRow(Cursor cursor, int rowNumber) {
-		return CursorUtils.getBoolean(cursor, columnName);
+		return CursorUtils.getBoolean(cursor, mColumnName);
 	}
 }
 
