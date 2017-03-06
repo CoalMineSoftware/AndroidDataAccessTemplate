@@ -1,5 +1,6 @@
-Android Data Access Template
-============================
+Android Data Access Template (formerly ContentProviderTemplate)
+===============================================================
+
 
 Modeled after [Spring](http://spring.io/) JdbcTemplate, Data Access Template aims to streamline the use of Android [content providers](http://developer.android.com/guide/topics/providers/content-providers.html) and [SQLite databases](https://developer.android.com/training/basics/data-storage/databases.html). Just like JdbcTemplate encapsulates the details of querying, Data Access Template encapsulates the details of not only querying but also inserting and updating, greatly reducing the amount of boilerplate code needed in a project.
 
