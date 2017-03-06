@@ -1,5 +1,7 @@
 package com.coalminesoftware.cursortemplate.annotation;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -36,19 +38,19 @@ public class AnnotationRowMapperTest {
 
 		Widget widget = mapper.mapRow(buildCursor(), 0);
 
-		assertNotNull(widget);
-		assertEquals(1, widget.getPrivateField());
-		assertEquals(2, widget.getProtectedField());
-		assertEquals(3, widget.getPublicField());
-		assertEquals(4, widget.getNamedPrivateField());
-		assertEquals(5, widget.getNamedProtectedField());
-		assertEquals(6, widget.getNamedPublicField());
-		assertEquals(7, widget.getPrivateBaseClassField());
-		assertEquals(8, widget.getProtectedBaseClassField());
-		assertEquals(9, widget.getPublicBaseClassField());
-		assertEquals(10, widget.getNamedPrivateBaseClassField());
-		assertEquals(11, widget.getNamedProtectedBaseClassField());
-		assertEquals(12, widget.getNamedPublicBaseClassField());
+		assertThat(widget, notNullValue());
+		assertThat(widget.getPrivateField(), is(1));
+		assertThat(widget.getProtectedField(), is(2));
+		assertThat(widget.getPublicField(), is(3));
+		assertThat(widget.getNamedPrivateField(), is(4));
+		assertThat(widget.getNamedProtectedField(), is(5));
+		assertThat(widget.getNamedPublicField(), is(6));
+		assertThat(widget.getPrivateBaseClassField(), is(7));
+		assertThat(widget.getProtectedBaseClassField(), is(8));
+		assertThat(widget.getPublicBaseClassField(), is(9));
+		assertThat(widget.getNamedPrivateBaseClassField(), is(10));
+		assertThat(widget.getNamedProtectedBaseClassField(), is(11));
+		assertThat(widget.getNamedPublicBaseClassField(), is(12));
 	}
 
 	@Test
@@ -62,7 +64,7 @@ public class AnnotationRowMapperTest {
 
 		ClassWithoutPublicNoArgConstructor instance = mapper.mapRow(buildCursor(), 0);
 
-		assertNotNull(instance);
+		assertThat(instance, notNullValue());
 	}
 
 	@Test
@@ -71,7 +73,7 @@ public class AnnotationRowMapperTest {
 
 		Widget widget = mapper.constructModelObject();
 
-		assertNotNull("Expected an instance of the row model class to have been constructed via reflection.", widget);
+		assertThat(widget, notNullValue());
 	}
 
 	@Test(expected=RuntimeException.class)
@@ -138,11 +140,9 @@ public class AnnotationRowMapperTest {
 	}
 
 	private static void assertThatMappingStrategyIsOfType(Class<? extends MappingStrategy> expectedStrategyClass, MappingStrategy actualMappingStrategy) {
-		assertNotNull("Mapping strategy instance expected",
-				actualMappingStrategy);
+		assertThat(actualMappingStrategy, notNullValue());
 
-		assertTrue("Expected mapping strategy to be of type"+expectedStrategyClass.getSimpleName(),
-				expectedStrategyClass.isAssignableFrom(actualMappingStrategy.getClass()));
+		assertThat(expectedStrategyClass.isAssignableFrom(actualMappingStrategy.getClass()), is(true));
 	}
 
 	/** Class without a no-argument constructor for AnnotationRowMapper to call, but with a second

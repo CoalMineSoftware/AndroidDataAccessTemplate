@@ -1,5 +1,6 @@
 package com.coalminesoftware.cursortemplate.naming;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -10,20 +11,18 @@ public class UnderscoredNamingStrategyTest {
 		NamingStrategy strategy = new UnderscoredNamingStrategy();
 
 		String identifierWithCaseChangeInMiddle = "abcDef";
-		assertEquals("abc_def", strategy.determineName(identifierWithCaseChangeInMiddle));
+		assertThat(strategy.determineName(identifierWithCaseChangeInMiddle), is("abc_def"));
 
 		String identifierStartingWithCapital = "AbcDef";
-		assertEquals("abc_def", strategy.determineName(identifierStartingWithCapital));
+		assertThat(strategy.determineName(identifierStartingWithCapital), is("abc_def"));
 
 		String identifierWithCapitalAtEnd = "abcdeF";
-		assertEquals("abcde_f", strategy.determineName(identifierWithCapitalAtEnd));
+		assertThat(strategy.determineName(identifierWithCapitalAtEnd), is("abcde_f"));
 
 		String identifierWithConsecutiveCapitals = "abCDef";
-		assertEquals("ab_c_def", strategy.determineName(identifierWithConsecutiveCapitals));
+		assertThat(strategy.determineName(identifierWithConsecutiveCapitals), is("ab_c_def"));
 
 		String identifierWithNumber = "strictI18n";
-		assertEquals("strict_i18n", strategy.determineName(identifierWithNumber));
+		assertThat(strategy.determineName(identifierWithNumber), is("strict_i18n"));
 	}
 }
-
-

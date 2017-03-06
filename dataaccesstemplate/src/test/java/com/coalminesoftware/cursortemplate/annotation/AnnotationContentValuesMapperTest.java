@@ -31,9 +31,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest=Config.NONE)
@@ -67,51 +67,52 @@ public class AnnotationContentValuesMapperTest {
 
 		ContentValues values = mapper.mapContentValues(widget);
 
-		assertEquals("Expected values from the fields annotated with @ContentValue", 12, values.size());
+		assertThat(values.size(), is(12));
 
-		assertEquals((Integer)1, values.getAsInteger("privateField"));
-		assertEquals((Integer)2, values.getAsInteger("protectedField"));
-		assertEquals((Integer)3, values.getAsInteger("publicField"));
-		assertEquals((Integer)4, values.getAsInteger("renamedPrivateField"));
-		assertEquals((Integer)5, values.getAsInteger("renamedProtectedField"));
-		assertEquals((Integer)6, values.getAsInteger("renamedPublicField"));
+		assertThat(values.getAsInteger("privateField"), is(1));
+		assertThat(values.getAsInteger("protectedField"), is(2));
+		assertThat(values.getAsInteger("publicField"), is(3));
+		assertThat(values.getAsInteger("renamedPrivateField"), is(4));
+		assertThat(values.getAsInteger("renamedProtectedField"), is(5));
+		assertThat(values.getAsInteger("renamedPublicField"), is(6));
+		// Field with 7 was purposely not mapped
 
-		assertEquals((Integer)8, values.getAsInteger("privateBaseClassField"));
-		assertEquals((Integer)9, values.getAsInteger("protectedBaseClassField"));
-		assertEquals((Integer)10, values.getAsInteger("publicBaseClassField"));
-		assertEquals((Integer)11, values.getAsInteger("renamedPrivateBaseClassField"));
-		assertEquals((Integer)12, values.getAsInteger("renamedProtectedBaseClassField"));
-		assertEquals((Integer)13, values.getAsInteger("renamedPublicBaseClassField"));
+		assertThat(values.getAsInteger("privateBaseClassField"), is(8));
+		assertThat(values.getAsInteger("protectedBaseClassField"), is(9));
+		assertThat(values.getAsInteger("publicBaseClassField"), is(10));
+		assertThat(values.getAsInteger("renamedPrivateBaseClassField"), is(11));
+		assertThat(values.getAsInteger("renamedProtectedBaseClassField"), is(12));
+		assertThat(values.getAsInteger("renamedPublicBaseClassField"), is(13));
 	}
 
 	@Test
 	public void testConstructor() {
 		Set<MappedField> fields = mapper.getMappableFields();
 
-		assertNotNull(fields);
-		assertEquals(12, fields.size());
+		assertThat(fields, notNullValue());
+		assertThat(fields.size(), is(12));
 
 		Map<String,MappedField> fieldsByValueKey = buildMappableFieldsMapByValueKey(fields);
 
 		// Fields from class that rely on the default
-		assertNotNull(fieldsByValueKey.get("privateField"));
-		assertNotNull(fieldsByValueKey.get("protectedField"));
-		assertNotNull(fieldsByValueKey.get("publicField"));
+		assertThat(fieldsByValueKey.get("privateField"), notNullValue());
+		assertThat(fieldsByValueKey.get("protectedField"), notNullValue());
+		assertThat(fieldsByValueKey.get("publicField"), notNullValue());
 
 		// Fields from class that specify a name
-		assertNotNull(fieldsByValueKey.get("renamedPrivateField"));
-		assertNotNull(fieldsByValueKey.get("renamedProtectedField"));
-		assertNotNull(fieldsByValueKey.get("renamedPublicField"));
+		assertThat(fieldsByValueKey.get("renamedPrivateField"), notNullValue());
+		assertThat(fieldsByValueKey.get("renamedProtectedField"), notNullValue());
+		assertThat(fieldsByValueKey.get("renamedPublicField"), notNullValue());
 
 		// Fields from base class that rely on the default
-		assertNotNull(fieldsByValueKey.get("privateBaseClassField"));
-		assertNotNull(fieldsByValueKey.get("protectedBaseClassField"));
-		assertNotNull(fieldsByValueKey.get("publicBaseClassField"));
+		assertThat(fieldsByValueKey.get("privateBaseClassField"), notNullValue());
+		assertThat(fieldsByValueKey.get("protectedBaseClassField"), notNullValue());
+		assertThat(fieldsByValueKey.get("publicBaseClassField"), notNullValue());
 
 		// Fields from base class that specify a name
-		assertNotNull(fieldsByValueKey.get("renamedPrivateBaseClassField"));
-		assertNotNull(fieldsByValueKey.get("renamedProtectedBaseClassField"));
-		assertNotNull(fieldsByValueKey.get("renamedPublicBaseClassField"));
+		assertThat(fieldsByValueKey.get("renamedPrivateBaseClassField"), notNullValue());
+		assertThat(fieldsByValueKey.get("renamedProtectedBaseClassField"), notNullValue());
+		assertThat(fieldsByValueKey.get("renamedPublicBaseClassField"), notNullValue());
 	}
 
 	@Test
@@ -160,11 +161,9 @@ public class AnnotationContentValuesMapperTest {
 
 
 	private static void assertThatMappingStrategyIsOfType(Class<? extends FieldMappingStrategy> expectedStrategyClass, FieldMappingStrategy actualMappingStrategy) {
-		assertNotNull("Field mapping strategy instance expected",
-				actualMappingStrategy);
-
-		assertTrue("Expected mapping strategy to be of type"+expectedStrategyClass.getSimpleName(),
-				expectedStrategyClass.isAssignableFrom(actualMappingStrategy.getClass()));
+		assertThat(actualMappingStrategy, notNullValue());
+		assertThat(expectedStrategyClass.isAssignableFrom(actualMappingStrategy.getClass()),
+				is(true));
 	}
 
 	private static Map<String,MappedField> buildMappableFieldsMapByValueKey(Set<MappedField> fields) {

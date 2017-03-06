@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 
 import com.coalminesoftware.cursortemplate.RowCallbackHandler;
 import com.coalminesoftware.cursortemplate.simple.SingleColumnIntegerRowMapper;
-import com.google.common.collect.Lists;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +27,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static java.util.Arrays.asList;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest=Config.NONE)
@@ -60,7 +60,7 @@ public class ContentProviderClientTemplateTest {
 				null,
 				new SingleColumnIntegerRowMapper());
 
-		assertEquals(columnValue, returned);
+		assertThat(returned, is(columnValue));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -91,8 +91,8 @@ public class ContentProviderClientTemplateTest {
 				null,
 				new SingleColumnIntegerRowMapper());
 
-		assertEquals(Lists.newArrayList(firstRowColumnValue, secondRowColumnValue),
-				returned);
+		assertThat(returned, is(
+				asList(firstRowColumnValue, secondRowColumnValue)));
 	}
 
 	@Test
@@ -118,8 +118,7 @@ public class ContentProviderClientTemplateTest {
 		expectedValues.add(firstRowColumnValue);
 		expectedValues.add(secondRowColumnValue);
 
-		assertEquals(expectedValues,
-				processCursorValues);
+		assertThat(processCursorValues, is(expectedValues));
 	}
 
 	@Test
@@ -129,7 +128,7 @@ public class ContentProviderClientTemplateTest {
 
 		new ContentProviderClientTemplate(client).closeClient();
 
-		assertTrue(clientShadow.isReleased());
+		assertThat(clientShadow.isReleased(), is(true));
 	}
 
 	@Test(expected=IllegalStateException.class)
@@ -155,7 +154,6 @@ public class ContentProviderClientTemplateTest {
 				.authority(AUTHORITY)
 				.appendPath("path")
 				.build();
-
 
 		private Cursor mQueryCursor;
 

@@ -9,11 +9,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 public class DeclaredFieldIteratorTest {
 	/** All of the columns that are known to exist in Widget and its ancestors (excluding Object.) */
@@ -28,23 +27,24 @@ public class DeclaredFieldIteratorTest {
 
 	@Test
 	public void testConstructor() {
-		assertEquals(Widget.class, fieldIterator.mCurrentClass);
-		assertArrayEquals(Widget.class.getDeclaredFields(), fieldIterator.mCurrentClassFields);
-		assertEquals(1, fieldIterator.mCurrentFieldIndex);
-		assertNotNull(fieldIterator.nextField);
+		// Because is() is overridden so users can easily assert that an object is of a certain
+		// type, it doesn't seem to be possible to test for equality when the object being tested is
+		// a Class object. So instead, call equals() directly and check that it returned true.
+		assertThat(Widget.class.equals(fieldIterator.mCurrentClass), is(true));
+		assertThat(fieldIterator.mCurrentClassFields, is(Widget.class.getDeclaredFields()));
+		assertThat(fieldIterator.mCurrentFieldIndex, is(1));
+		assertThat(fieldIterator.nextField, notNullValue());
 	}
 
 	@Test
 	public void testHasNext() {
 		for(int i=1; i<=WIDGET_FIELD_NAMES.size(); i++) {
-			assertTrue("Method hasNext() returned false unexpectedly, on call "+i,
-					fieldIterator.hasNext());
+			assertThat(fieldIterator.hasNext(), is(true));
 
 			fieldIterator.advanceToNextField();
 		}
 
-		assertFalse("Iterator returned true when no more fields should exist to iterate over",
-				fieldIterator.hasNext());
+		assertThat(fieldIterator.hasNext(), is(false));
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class DeclaredFieldIteratorTest {
 				iteratedFieldNames.add(fieldIterator.next().getName());
 			}
 
-			assertEquals(WIDGET_FIELD_NAMES, iteratedFieldNames);
+			assertThat(iteratedFieldNames, is(WIDGET_FIELD_NAMES));
 		}
 	}
 
