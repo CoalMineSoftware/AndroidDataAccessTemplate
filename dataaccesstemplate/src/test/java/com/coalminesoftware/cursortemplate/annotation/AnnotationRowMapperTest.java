@@ -151,5 +151,3 @@ public class AnnotationRowMapperTest {
 		public ClassWithoutPublicNoArgConstructor(int parameter) { }
 	}
 }
-
-

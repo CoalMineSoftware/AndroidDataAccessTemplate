@@ -38,11 +38,11 @@ import static org.junit.Assert.assertThat;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest=Config.NONE)
 public class AnnotationContentValuesMapperTest {
-	AnnotationContentValuesMapper<Widget> mapper;
+	AnnotationContentValuesMapper<Widget> mMapper;
 
 	@Before
 	public void setUp() throws Exception {
-		mapper = AnnotationContentValuesMapper.forClass(Widget.class);
+		mMapper = AnnotationContentValuesMapper.forClass(Widget.class);
 	}
 
 	@Test
@@ -65,7 +65,7 @@ public class AnnotationContentValuesMapperTest {
 		widget.setNamedPublicBaseClassField(13);
 		widget.setUnmappedBaseClassField(14);
 
-		ContentValues values = mapper.mapContentValues(widget);
+		ContentValues values = mMapper.mapContentValues(widget);
 
 		assertThat(values.size(), is(12));
 
@@ -87,7 +87,7 @@ public class AnnotationContentValuesMapperTest {
 
 	@Test
 	public void testConstructor() {
-		Set<MappedField> fields = mapper.getMappableFields();
+		Set<MappedField> fields = mMapper.getMappableFields();
 
 		assertThat(fields, notNullValue());
 		assertThat(fields.size(), is(12));

@@ -34,18 +34,18 @@ import static org.junit.Assert.assertThat;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest=Config.NONE)
 public class ContentProviderClientTemplateTest {
-	private TestContentProvider provider;
-	private ContentResolver resolver;
+	private TestContentProvider mProvider;
+	private ContentResolver mResolver;
 
 	@Before
 	public void setup() {
 		ProviderInfo info = new ProviderInfo();
 		info.authority = TestContentProvider.AUTHORITY;
-		provider = Robolectric.buildContentProvider(TestContentProvider.class).create(info).get();
+		mProvider = Robolectric.buildContentProvider(TestContentProvider.class).create(info).get();
 
-		resolver = RuntimeEnvironment.application.getContentResolver();
+		mResolver = RuntimeEnvironment.application.getContentResolver();
 
-		provider.onCreate();
+		mProvider.onCreate();
 	}
 
 
@@ -53,9 +53,9 @@ public class ContentProviderClientTemplateTest {
 	public void testQueryWithRowMapper_withSingleCursorRow() {
 		Integer columnValue = 1;
 
-		provider.setQueryCursor(buildSingleColumnCursor("x", columnValue));
+		mProvider.setQueryCursor(buildSingleColumnCursor("x", columnValue));
 
-		Integer returned = new ContentProviderClientTemplate(resolver).query(
+		Integer returned = new ContentProviderClientTemplate(mResolver).query(
 				TestContentProvider.URI,
 				null,
 				new SingleColumnIntegerRowMapper());
@@ -67,11 +67,11 @@ public class ContentProviderClientTemplateTest {
 	public void testQueryWithRowMapper_cursorWithMultipleRows() {
 		Integer columnValue = 1;
 
-		provider.setQueryCursor(buildSingleColumnCursor("x",
+		mProvider.setQueryCursor(buildSingleColumnCursor("x",
 				columnValue,
 				columnValue));
 
-		new ContentProviderClientTemplate(resolver).query(
+		new ContentProviderClientTemplate(mResolver).query(
 				TestContentProvider.URI,
 				null,
 				new SingleColumnIntegerRowMapper());
@@ -82,11 +82,11 @@ public class ContentProviderClientTemplateTest {
 		Integer firstRowColumnValue = 1;
 		Integer secondRowColumnValue = 2;
 
-		provider.setQueryCursor(buildSingleColumnCursor("x",
+		mProvider.setQueryCursor(buildSingleColumnCursor("x",
 				firstRowColumnValue,
 				secondRowColumnValue));
 
-		List<Integer> returned = new ContentProviderClientTemplate(resolver).queryForList(
+		List<Integer> returned = new ContentProviderClientTemplate(mResolver).queryForList(
 				TestContentProvider.URI,
 				null,
 				new SingleColumnIntegerRowMapper());
@@ -100,13 +100,13 @@ public class ContentProviderClientTemplateTest {
 		final Integer firstRowColumnValue = 100;
 		final Integer secondRowColumnValue = 200;
 
-		provider.setQueryCursor(buildSingleColumnCursor("x",
+		mProvider.setQueryCursor(buildSingleColumnCursor("x",
 				firstRowColumnValue,
 				secondRowColumnValue));
 
 		final Set<Integer> processCursorValues = new HashSet<>();
 
-		new ContentProviderClientTemplate(resolver).query(TestContentProvider.URI, null,
+		new ContentProviderClientTemplate(mResolver).query(TestContentProvider.URI, null,
 				new RowCallbackHandler() {
 					@Override
 					public void processRow(Cursor cursor, int rowNumber) {
@@ -123,7 +123,7 @@ public class ContentProviderClientTemplateTest {
 
 	@Test
 	public void testReleaseClient_clientIsReleased() {
-		ContentProviderClient client = resolver.acquireContentProviderClient(TestContentProvider.URI);
+		ContentProviderClient client = mResolver.acquireContentProviderClient(TestContentProvider.URI);
 		ShadowContentProviderClient clientShadow = Shadows.shadowOf(client);
 
 		new ContentProviderClientTemplate(client).closeClient();
@@ -133,7 +133,7 @@ public class ContentProviderClientTemplateTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void testReleaseClient_exceptionThrownWhenConstructedWithResolver() {
-		new ContentProviderClientTemplate(resolver).closeClient();
+		new ContentProviderClientTemplate(mResolver).closeClient();
 	}
 
 	private static Cursor buildSingleColumnCursor(String columnName, Object... rowValues) {

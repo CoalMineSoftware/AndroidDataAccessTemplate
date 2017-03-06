@@ -68,5 +68,3 @@ public class BaseWidget {
 		this.unmappedBaseClassField = unmappedBaseClassField;
 	}
 }
-
-

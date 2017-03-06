@@ -1,6 +1,5 @@
 package com.coalminesoftware.cursortemplate.annotation;
 
-
 public class Widget extends BaseWidget {
 	@Column
 	private int privateField;
@@ -68,5 +67,3 @@ public class Widget extends BaseWidget {
 		this.unmappedField = unmappedField;
 	}
 }
-
-
